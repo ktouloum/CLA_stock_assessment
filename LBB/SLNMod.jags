@@ -1,0 +1,48 @@
+
+  model {
+  r.alpha.d_tau  <- pow(r.alpha.sd.pr, -2) 
+  r.alpha.d      ~ dnorm(r.alpha.pr,r.alpha.d_tau) 
+
+   Lc.d_tau  <- pow(Lc.sd.pr,-2)
+   Lc.d      ~ dnorm(Lc.pr,Lc.d_tau) #       
+
+   MK.d_tau  <-pow(MK.sd.pr, -2) # strong prior on M/K
+   MK.d      ~ dnorm(MK.pr, MK.d_tau)
+
+   Linf.tau  <- pow(Linf.sd.pr,-2) 
+   Linf.d    ~ dnorm(Linf.pr,Linf.tau)
+    
+   FK.d       ~ dlnorm(log(FK.pr),4) # wide prior range for F/K
+
+   SL[1]       ~ dlogis(0,1000)
+   Freq.pred[1]<-0
+   xN[1]       <-1
+
+   p.low    <- ifelse(Pile==1,0.99,0)   
+   p.hi     <- ifelse(Pile==0,0.01,1)
+   pile.fac ~ dunif(p.low,p.hi)
+
+
+   for(j in 2:n.L) {
+    SL[j] <- 1/(1+exp(-r.alpha.d*(((L.y[j]+L.y[j-1])/2)/Linf.d-Lc.d/Linf.d))) # selection at mid-length of bin
+
+    xN[j] <- xN[j-1]*((Linf.d-L.y[j])/(Linf.d-L.y[j-1]))^(MK.d+FK.d*SL[j]) # predicted numbers without pile-up
+     
+    cN[j] <- (xN[j-1]-xN[j])/(MK.d+FK.d*SL[j]) # predicted relative frequency with pile-up correction
+
+    dN[j] <- cN[j]-xN[j] # difference between corrected and uncorrected frequencies
+    
+    uN[j] <- xN[j] + dN[j]*pile.fac # gradual application of correction with pile.fac between 0 and 1
+
+		Freq.pred[j]<-uN[j]*SL[j] # relative frequencies of vulnerable individuals
+		
+    # normalize frequencies by dividing by sum of frequencies; multiply with 10 to avoid small numbers and with 1000 for effective sample size
+    r.Freq.pred[j]<- Freq.pred[j]/sum(Freq.pred)*10*1000
+  }	
+  
+  #><> LIKELIHOOD FUNCTION
+  #><> Fit observed to predicted LF data using a Dirichlet distribution (more robust in JAGS)
+  r.Freq.y[2:n.L] ~ ddirch(r.Freq.pred[2:n.L])  
+ 
+  } # END OF MODEL
+    
