@@ -1,4 +1,4 @@
-# CLA_stock_assessment
+# CLA (Catch Length Abundance) stock assessment toolbox
 
 ![Alt text](/ABC_LOGO.jpg?raw=true "Catch Length Abundance - Stock Assessment")
 
