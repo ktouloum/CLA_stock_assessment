@@ -10,7 +10,7 @@
 #4. downoad and install necessary packages, by running the following lines, after removing the hashtag (#)
 # list.of.packages <-c("shiny","shinydashboard","shinyWidgets","DT","shinyBS","mvtnorm","conicfit","htm2txt",
 #                      "stringi","imputeTS","neuralnet","coda","tibble","gplots","ggpubr","ggplot2","R2jags",
-#                      "shinyFiles","fs","data.table","randtests","shinycssloaders")
+#                      "shinyFiles","fs","data.table","randtests","shinycssloaders","datamods")
 #new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 #if(length(new.packages)) install.packages(new.packages)
 
@@ -44,7 +44,7 @@ library(shinycssloaders)
 library(tidyr)
 library(dplyr)
 library(datamods)
-library(plotly)
+#library(plotly)
 
  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
  path=getwd()
@@ -570,12 +570,6 @@ ANN.priors=function(Catch.obj,MSY ) {
 }
 
 
-
-
-
-
-
-
 rk_priors=function(rlow,rhigh,MSY,Stock_objID) {
   n            <- 5000 # number of points in multivariate cloud in graph panel (b)
   log.msy.pr=log(as.numeric(MSY))
@@ -642,7 +636,6 @@ q.priors=function(ABC.obj,rk.obj,METHOD) {
   
   return(c(q.prior,q.init))
 }  
-
 
 
 ABC_fit= function(ABC.obj,rk.obj,q.obj,METHOD) {
@@ -1729,7 +1722,6 @@ ggplot.retro=function(ABC.object) {
   max.y_ffmsy <- max(c(1.2,1.1*retros$FFmsy),na.rm=T)
   max.y_bbmsy <- max(c(1.2, 1.1*retros$BBmsy ),na.rm=T)
   
-  
   my_y_title1 <-bquote(atop("F/Fmsy Retrospective"~"for"~the~stock~bold(.(ABC.object[["input"]][["Stock_info"]]$Stock))~of~italic(.(ABC.object[["input"]][["Stock_info"]]$ScientificName))))
   my_y_title2 <-bquote(atop("B/Bmsy Retrospective"~"for"~the~stock~bold(.(ABC.object[["input"]][["Stock_info"]]$Stock))~of~italic(.(ABC.object[["input"]][["Stock_info"]]$ScientificName))))
   
@@ -1759,7 +1751,6 @@ ggplot.retro=function(ABC.object) {
   pic_all=ggpubr::ggarrange(picffmsy,picbbmsy,
                             labels=c("A","B"),
                             ncol = 2,nrow = 1)
-  
   return(pic_all)
 }
 
@@ -1812,23 +1803,19 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
       initial = status.quo
     }
   }
-  
   if (quant == "F") {
     status.quo =   mean(ABC_res[["output"]][["output_timeseries"]][["f"]][(n - (status.quo_years-1)):n])
     if (is.null(initial)) {
       initial = status.quo
     }
   }
-  
   if (interim.quant == "Catch") {
     #  interim_var = mean(ABC_res[["input"]][["Input_data"]][["ct"]][(n - (status.quo_years-1)):n])
     interim_var = mean(ABC_res[["output"]][["output_timeseries"]][["Catch"]][(n - (status.quo_years-1)):n])
   }
-  
   if (interim.quant == "F") {
     interim_var =   mean(ABC_res[["output"]][["output_timeseries"]][["f"]][(n - (status.quo_years-1)):n])
   }
-  
   
   fmsy=ifelse(unique(ABC_res[["output"]][["output_posteriors"]][["Fmsy_post_correction_note"]])=="Fmsy was corrected downward to account for reduced recruitment.",
               ABC_res[["output"]][["output_posteriors"]][["Fmsy_post_corrected"]][1],
