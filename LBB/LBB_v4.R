@@ -1630,7 +1630,7 @@ would have maximum biomass, and the asymptotic length (Linf)."))),background = "
                                              # helpText("Some guidance!!!!!!probably:"),
                                               
                                                                      sliderInput(inputId = "MK_CV", label = "Set M/K CV",
-                                                                                 min = 0, max = 1, value =0.15, step =0.05)
+                                                                                 min = 0.01, max = 0.5, value =0.05, step =0.01)
                                                                      ,width = 6))),
                               
                               shiny::fluidRow(
