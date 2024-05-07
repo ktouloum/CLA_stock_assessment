@@ -2953,12 +2953,9 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
                                                                               shinycssloaders::withSpinner(shiny::plotOutput("bk_forecast")),
                                                                               shiny::h5("TEXT"),
                                                                               width = 12)
-                                                          
                                                           )
-                                  
                                 )
                                 )
-
         ),
       
         shinydashboard::tabItem(tabName = "addit_info",
@@ -3040,11 +3037,9 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
       updateTextInput(session, "Sp_Comm", value = species_DB$FBname[species_DB$Species==input$Sp_Scient])
     })
     
-    
     Common_name=reactive({
       xx=input$Sp_Comm
     })
-    
     
     ###CREATE box(title = "Selected Species Info"
     output$Sps_Info=shinydashboard::renderValueBox({
@@ -3822,12 +3817,12 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
           ggplot2::theme(legend.position="bottom")
       } else {
         LBB_data_=as.data.frame(LBB_data())
-        LBB_data_$BK.ucl[LBB_data_$BK.ucl>1]=1
-        LBB_data_$Bk.lcl[LBB_data_$Bk.lcl<0]=0
+        LBB_data_$BB0.ucl.ts[LBB_data_$BB0.ucl.ts>1]=1
+        LBB_data_$BB0.lcl.ts[LBB_data_$BB0.lcl.ts<0]=0
         p2=ggplot2::ggplot() +
-          geom_ribbon(data=LBB_data_,ggplot2::aes(x=Year, ymin =Bk.lcl, ymax =BK.ucl,fill = "A"), alpha=0.3)+
-          geom_line(data=LBB_data_,ggplot2::aes(x=Year, y =Bk,color="A"))+#,linetype="dashed"
-          geom_point(data=LBB_data_,ggplot2::aes(x=Year, y =Bk,color="A"))+
+          geom_ribbon(data=LBB_data_,ggplot2::aes(x=Year, ymin =BB0.lcl.ts, ymax =BB0.ucl.ts,fill = "A"), alpha=0.3)+
+          geom_line(data=LBB_data_,ggplot2::aes(x=Year, y =BB0.ts,color="A"))+#,linetype="dashed"
+          geom_point(data=LBB_data_,ggplot2::aes(x=Year, y =BB0.ts,color="A"))+
           ggplot2::geom_errorbar(aes(x=start_yr, ymin=start[1], ymax=start[2],linetype="C"),color="blue", width=1, size=1)+
           ggplot2::geom_errorbar(aes(x=input$man_Bk_int_year_A, ymin=ind[1], ymax=ind[2],linetype="C"),color="blue", width=1, size=1)+
           ggplot2::geom_errorbar(aes(x=end_yr, ymin=end[1], ymax=end[2],linetype="C"),color="blue", width=1, size=1)+
@@ -3859,8 +3854,7 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
     ANN_priors=reactive({
     req(MSY_calculated())
       req(Catch_obj())
-    ANN.priors(Catch_obj(),MSY_calculated() )
-    
+    ANN.priors(Catch_obj(),MSY_calculated())
     })
     
     observe({
@@ -3878,12 +3872,10 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
     observe({
       updateSliderInput(session, "man_Bk_end", value = c( input$man_Bk_end_A[1], input$man_Bk_end_A[2]))
     })
-  
     
     output$You_can_proceed_to_run=shinydashboard::renderValueBox({
       shinydashboard::valueBox( shiny::h4("You can now proceed to'Run the model' tab"),shiny::h5(" "),
                                 icon = shiny::icon("envelope"),color = "light-blue")})
-    
     
     output$Biomass_plot_3= shiny::renderPlot({
       req(bio_obj())
@@ -3891,11 +3883,9 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
       temp_catch_obj=Catch_obj()
       temp_bio_obj=bio_obj()
       f_bio_obj=merge(x = temp_catch_obj, y = temp_bio_obj, by = "yr", all.x = TRUE)
-      
       start_exp=input$man_Bk_start
       ind_exp=input$man_Bk_int
       end_exp=input$man_Bk_end
-      
       start_ANN=c(as.numeric(ANN_priors()[1,1]),as.numeric(ANN_priors()[2,1]))
       ind_ANN=c(as.numeric(ANN_priors()[1,2]),as.numeric(ANN_priors()[2,2]))
       end_ANN=c(as.numeric(ANN_priors()[1,3]),as.numeric(ANN_priors()[2,3]))
@@ -3950,7 +3940,6 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
           ggplot2::theme(legend.position="bottom")+
           ggplot2::scale_y_continuous(breaks=seq(0,1.25,0.1),limits = c(0,1.25))+
           ggplot2::labs(y="B/k", x="Year",title=my_y_title,color="")
-        
       }
       print(p_1)
     })

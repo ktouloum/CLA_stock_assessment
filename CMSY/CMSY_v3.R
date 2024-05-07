@@ -3236,12 +3236,12 @@ library(shinycssloaders)
       } else {
         LBB_data_=as.data.frame(LBB_data())
 
-        LBB_data_$BK.ucl[LBB_data_$BK.ucl>1]=1
-        LBB_data_$Bk.lcl[LBB_data_$Bk.lcl<0]=0
+        LBB_data_$BB0.ucl.ts[LBB_data_$BB0.ucl.ts>1]=1
+        LBB_data_$BB0.lcl.ts[LBB_data_$BB0.lcl.ts<0]=0
         p2=ggplot2::ggplot() +
-          geom_ribbon(data=LBB_data_,ggplot2::aes(x=Year, ymin =Bk.lcl, ymax =BK.ucl,fill = "A"), alpha=0.3)+
-          geom_line(data=LBB_data_,ggplot2::aes(x=Year, y =Bk,color="A"))+#,linetype="dashed"
-          geom_point(data=LBB_data_,ggplot2::aes(x=Year, y =Bk,color="A"))+
+          geom_ribbon(data=LBB_data_,ggplot2::aes(x=Year, ymin =BB0.lcl.ts, ymax =BB0.ucl.ts,fill = "A"), alpha=0.3)+
+          geom_line(data=LBB_data_,ggplot2::aes(x=Year, y =BB0.ts,color="A"))+#,linetype="dashed"
+          geom_point(data=LBB_data_,ggplot2::aes(x=Year, y =BB0.ts,color="A"))+
           ggplot2::geom_errorbar(aes(x=start_yr, ymin=start[1], ymax=start[2],linetype="C"),color="blue", size=1)+
           ggplot2::geom_errorbar(aes(x=input$man_Bk_int_year_A, ymin=ind[1], ymax=ind[2],linetype="C"),color="blue", size=1)+
           ggplot2::geom_errorbar(aes(x=end_yr, ymin=end[1], ymax=end[2],linetype="C"),color="blue", size=1)+
