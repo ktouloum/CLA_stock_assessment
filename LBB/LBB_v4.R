@@ -1833,21 +1833,21 @@ would have maximum biomass, and the asymptotic length (Linf)."))),background = "
                                           sliderInput(inputId = "Lc.user", label = "",
                                                       min = 0, max = 500, value =1, step =1)),width=12)),
                         conditionalPanel(condition = "input.GausSel=='TRUE'",  
-                                                             tags$b("Set Lmean such that blue line best matches the left-hand data points"),
+                                                             tags$b("Set Lmean and SD such that the blue curve best matches the left-hand data points of gillnet selectivity"),
                                                             # helpText("Note: set L.mean such that blue line best matches the increase of left-hand data points."),
                                                              shinyWidgets::prettySwitch(
                                                                inputId = "Lmeanswitch",
                                                                slim = T,
-                                                               label = "Edit",
+                                                               label = "Edit Lmean",
                                                                value = FALSE,status = "info" ),
                                                              conditionalPanel(condition = "input.Lmeanswitch",
                                                                               sliderInput(inputId = "Lmean.user", label = "",
                                                                                           min = 0, max = 500, value =1, step =1)),
-                                                            tags$b("Set sd for Lmean"),
+                                                          #  tags$b("Set sd for Lmean"),
                                                              shinyWidgets::prettySwitch(
                                                               inputId = "Lmeanswitch_CV",
                                                               slim = T,
-                                                              label = "Edit",
+                                                              label = "Edit Lmean sd",
                                                               value = FALSE,status = "info" ),
                                                             conditionalPanel(condition = "input.Lmeanswitch_CV",
                                                                              sliderInput(inputId = "LmeanCV.user", label = "",
@@ -3138,7 +3138,8 @@ deaf_gaus=deaf_gaus[deaf_gaus$L<=1.05*wt,]
 
 new_gaus=data.frame(L=lfs,y=dnorm(lfs,mean=input$Lmean.user,
                                             sd=input$LmeanCV.user)/max(dnorm(lfs,mean=input$Lmean.user,sd=input$LmeanCV.user)))
-new_gaus=new_gaus[new_gaus$L<=1.05*input$Lmean.user,]    
+new_gaus_=new_gaus[new_gaus$L<=1.05*input$Lmean.user,]    
+new_gaus_add=new_gaus[new_gaus$L>=1.05*input$Lmean.user,]    
 
        pic_AG=ggplot(data=LF_ALL, aes(x=Length, y=Freq))+
        # geom_line()+
@@ -3146,7 +3147,8 @@ new_gaus=new_gaus[new_gaus$L<=1.05*input$Lmean.user,]
        geom_line(color="#F8766D")+
        theme_bw()+
        geom_line(data=deaf_gaus,aes(x=L,y=y),color="gray",size=2)+
-       geom_line(data=new_gaus,aes(x=L,y=y),color="blue",size=2)+
+       geom_line(data=new_gaus_,aes(x=L,y=y),color="blue",size=2)+
+         geom_line(data=new_gaus_add,aes(x=L,y=y),color="blue",size=1,linetype="dotted")+
          geom_vline(aes(xintercept = input$Lmean.user),color="#00BA38",size=1)+
          geom_text(aes(y = 0.2, x = input$Lmean.user, label = paste0("Lmean")),size=6,col="#00BA38")+
          geom_vline(aes(xintercept =input$Linf.user),color="#619CFF",size=1)+
