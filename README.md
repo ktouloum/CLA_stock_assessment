@@ -5,4 +5,4 @@
 </div>
 
 
-Click the $${\color{green}green "<> Code"}$$ button, and download the shiny scripts as zip file. 
+Click the green "<> Code" button, and download the shiny scripts as zip file. 
