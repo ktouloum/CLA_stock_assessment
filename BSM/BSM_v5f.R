@@ -2255,7 +2255,7 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
                                                                 status = "info" ),
                                                               conditionalPanel(condition = "input.upMaterial1",
                                                                                sliderInput("yr_slct", "",
-                                                                                           min = 1900, max = 2023, value = c(1900, 2023),step=1,sep = "")),
+                                                                                           min = 1900, max = 2026, value = c(1900, 2026),step=1,sep = "")),
                                                               tags$b("Smooth catch data if variability is unreasonably high"),
                                                               shinyWidgets::prettySwitch(
                                                                 inputId = "upMaterial2",
@@ -2310,7 +2310,7 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
                                                                 value = FALSE,status = "info" ),
                                                               conditionalPanel(condition = "input.upMaterial4",
                                                                                sliderInput("bio_yr_slct", "",
-                                                                                           min = 1900, max = 2023, value = c(2005,2020),step=1,sep = "")),
+                                                                                           min = 1900, max = 2026, value = c(2005,2020),step=1,sep = "")),
                                                               #helpText("Note: Select start year such that you trust that the data are reasonable."),
                                                                                     tags$b("Correct CPUE data for effort creep"),
                                                               shinyWidgets::prettySwitch(
@@ -2322,7 +2322,7 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
                                                               conditionalPanel(condition = "input.ecreepyes",
                                                                                uiOutput("help_ecreep"),
                                                                                sliderInput("ecreep_year", "Set starting year for ecreep",
-                                                                                           min = 1900, max = 2023, value = 2000,step=1,sep = ""),      
+                                                                                           min = 1900, max = 2026, value = 2000,step=1,sep = ""),      
                                                                                helpText("Note: Choose the year from which the ecreep effect starts. Consider that the first sonars became available in the 1970s, the first GPS units in the 1980s, cheap fish finders and chart plotters after 2000."),
                                                                                sliderInput("ecreepslider", "% value",
                                                                                            min = 0, max = 5, value = c(2),step=0.5,sep = "")
@@ -2367,23 +2367,35 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
                                 shiny::fluidRow(
                                   conditionalPanel(condition = "input.prepare_data",
                                                    shinydashboard::valueBoxOutput("Stock_infobox_patience",width = 12))),
-                                shiny::fluidRow( shiny::h3("A. Establish connection to FishBase or SeaLifeBase")),
-                                shiny::fluidRow(
+                                shiny::fluidRow( shiny::h3("Select resilience - r priors")),
+                                  shiny::fluidRow( column(width = 4,
                                   conditionalPanel(condition = "input.prepare_data",
                                                    shinydashboard::box(collapsible = F,
                                                                        # uiOutput("cond_ifmany"),
-                                                                       shinyWidgets::actionBttn(inputId="procc_rpriors",label ="Connect",
+                                                                       shinyWidgets::actionBttn(inputId="procc_rpriors",label ="Start",
                                                                                                 style = "unite",size = "md",icon = shiny::icon("paper-plane"),
                                                                                                 no_outline=F,block=F,color="primary"),
                                                                        shinyBS::bsTooltip("procc_rpriors", title="Press to proceed to the next step",
                                                                                           placement = "bottom", trigger = "hover",
-                                                                                          options = NULL),width = 4
-                                                   )),
-                                  conditionalPanel(condition = "input.procc_rpriors",
-                                                   shinycssloaders::withSpinner(shinydashboard::valueBoxOutput("Stock_infobox_3",width = 8)))
-                                ),
-                                shiny::fluidRow(
-                                conditionalPanel(condition = "input.procc_rpriors",shiny::h3("B. Select r prior"))),
+                                                                                          options = NULL),width = 12
+                                                   ))),
+                                column(width = 4,
+                                       conditionalPanel(condition = "input.procc_rpriors",
+                                                        shinycssloaders::withSpinner(shinydashboard::valueBoxOutput("Stock_infobox_3",width = 12)))
+                                ),       
+                                column(width = 4,
+                                       conditionalPanel(condition ="input.procc_rpriors",
+                                                        #shinydashboard::valueBoxOutput("Stock_infobox_patience",width = 4),
+                                                        shinydashboard::box(collapsible = F,align="center",background="green",
+                                                                            # uiOutput("cond_ifmany"),
+                                                                            shiny::h4("Press 'Connect' to establish connection to FishBase or SeaLifeBase to get information on resilience and r priors for your stock"),
+                                                                            shinyWidgets::actionBttn(inputId="con_fbase",label ="Connect",
+                                                                                                     style = "unite",size = "md",icon = shiny::icon("info"),
+                                                                                                     no_outline=F,block=F,color="success"),
+                                                                            shinyBS::bsTooltip("con_fbase", title="Press to proceed to the next step",
+                                                                                               placement = "bottom", trigger = "hover",
+                                                                                               options = NULL),width = 12
+                                                        )))), 
                                 shiny::fluidRow(
                                   conditionalPanel(condition = "input.procc_rpriors",
                                                    shinydashboard::box(collapsible = F,
@@ -2392,7 +2404,7 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
                                                                          inputId = "Acc_FBpriors",
                                                                          label = "Edit",
                                                                           slim = T,
-                                                                         value = FALSE,status = "info" ),
+                                                                         value = T,status = "info" ),
                                                                        helpText("Note: The Resilience classification from FishBase/SeaLifeBase provides a general and often best first prior range for r and is used as default. You can manually change that range if better data are available. Note that High resilience only applies to species which reproduce within their first year."),
                                                                        conditionalPanel(condition = "input.Acc_FBpriors",
                                                                                         selectInput("resilience_in","Resilience",
@@ -2408,13 +2420,14 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
                                                                          label = " Accept r prior and continue",
                                                                          status = "primary"),
                                                                        width=4)),
+                                  conditionalPanel(condition = "input.con_fbase",
+                                                   shinycssloaders::withSpinner(shinydashboard::valueBoxOutput("FB_resil",width =5))),
                                   conditionalPanel(condition = "input.procc_rpriors",
-                                                   shinydashboard::valueBoxOutput("FB_resil",width =5),
                                                    shinydashboard::valueBoxOutput("Res_rpriors",width = 3))
                                 ),
                                 fluidRow(
                                   conditionalPanel(condition = "input.Acc_rpriors",
-                                                   h3("C. Select other priors. Start by setting prior of relative stock size (B/k) for a selected year"))),
+                                                   h3("Select other priors. Start by setting prior of relative stock size (B/k) for a selected year"))),
                                 shiny::fluidRow(
                                   conditionalPanel(condition = "input.Acc_rpriors",
                                                    shinydashboard::box(collapsible = F,
@@ -2468,7 +2481,7 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
                                                                                 value = FALSE,status = "info" ),
                                                                               conditionalPanel(condition = "input.upMat2",
                                                                                                                    sliderInput("man_Bk_int_year_A", "Select year for intermediate B/k prior",
-                                                                                                           min = 1900, max = 2023, value = 2020,step=1,sep = ""),
+                                                                                                           min = 1900, max = 2026, value = 2020,step=1,sep = ""),
                                                                                                selectInput("expert_bk_ind","",#B/k intermediate year based on expertise knowledge
                                                                                                            choices= c("","Unexploited, 0.75-1.0", "Sustainable, 0.4-0.8", "Medium, 0.2-0.6", "Low, 0.01-0.4","Very low, 0.01-0.2"),
                                                                                                            selected = ""),
@@ -2505,7 +2518,7 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
                                                      status = "primary"))),
                                 fluidRow(
                                   conditionalPanel(condition = "input.Priors_but2",
-                                                   shiny::h5("Compare your initial prior settings with the pattern proposed by a neural network (ANN) based on the catch pattern. Note that the ANN pattern may not apply to your stock and that especially the first year may be wrong because ANN cannot distinguish between early low catches stemming from low effort (= nearly unexploited B/k) or previous overfishing (= very low B/k)."))),
+                                                   shiny::h4("Compare your initial prior settings with the pattern proposed by a neural network (ANN) based on the catch pattern. Note that the ANN pattern may not apply to your stock and that especially the first year may be wrong because ANN cannot distinguish between early low catches stemming from low effort (= nearly unexploited B/k) or previous overfishing (= very low B/k)."))),
                                 shiny::fluidRow(conditionalPanel(condition = "input.Priors_but2",
                                                                  shiny::h5("Select starting and ending year, explore Catch plot and MSY priors."))),
                                 shiny::fluidRow(
@@ -2531,7 +2544,7 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
                                                                                                                  value = FALSE,status = "info" ),
                                                                                                                conditionalPanel(condition = "input.upMaterial6",
                                                                                                                                 sliderInput("man_Bk_int_year", "Select year for intermediate B/k prior",
-                                                                                                                                            min = 1900, max = 2023, value = 2020,step=1,sep = ""),
+                                                                                                                                            min = 1900, max = 2026, value = 2020,step=1,sep = ""),
                                                                                                                                 sliderInput("man_Bk_int", "",
                                                                                                                                             min = 0, max = 1.25, value = c(0.4, 0.8),step=0.01,sep = "")),
                                                                                                                tags$b("Change B/k prior for end year"),
@@ -3598,7 +3611,7 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
     
     #########SELECT STOCK TO WORK WITH PRIORS
     output$Stock_infobox_patience=shinydashboard::renderValueBox({
-      shinydashboard::valueBox( shiny::h4("Start priors processing"),shiny::h5("Press 'Connect' button to connect to FishBase or SeaLifeBase 
+      shinydashboard::valueBox( shiny::h4("Start priors processing"),shiny::h5("Press 'Start' to enter resilience and r priors. You will also have the option to press 'Connect' button to connect to FishBase or SeaLifeBase
                                                                              for extraction of prior information. You will then have the 
                                                                              option to edit that information. Be patient since establishing the 
                                                                              connection may take a moment. Wait until the 'FishBase/SeaLifeBase info' box appears. If there is no Internet connection, a message will appear and you can enter the r-prior manually.
@@ -3613,13 +3626,13 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
         ))),
         icon = shiny::icon("thumbs-up", lib = "glyphicon"),color = "light-blue") })
 
-    Fishbase_text=eventReactive(input$procc_rpriors,{
+    Fishbase_text=eventReactive(input$con_fbase,{
       req(Final_stock())
       results= fbsb(Final_stock()[["Catch_ID"]][1,"ScientificName"])
       return(results)
     })
     
-    url_r=eventReactive(input$procc_rpriors,{
+    url_r=eventReactive(input$con_fbase,{
       url= a("Link", href=Fishbase_text()[6],style = "color:black") })
     
     output$FB_resil=shinydashboard::renderValueBox({
@@ -4615,6 +4628,36 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
     })
     
     ABC_FW <- ABC_FW %>% debounce(500)
+    
+    observeEvent(input$Start_forecast, {
+      req(ABC_FW())
+      
+      if (input$Id049=="A") {
+        nm=object_NAME()} else if (input$Id049=="B") {
+          nm=input$Id081}
+      # device_="tiff"
+      # 
+      # ggsave(filename=paste0(paste0(dir.name(),"/BSM/outputs/",nm,"/","rk_pic."),device_),plot=run_pictures$pic_A, device =device_, width = 16, height =10, units = "cm",  dpi = 300)
+      # ggsave(filename=paste0(paste0(dir.name(),"/BSM/outputs/",nm,"/","Catch_and_MSY."),device_),plot=run_pictures$pic_B, device =device_, width = 16, height =10, units = "cm",  dpi = 300)
+      # ggsave(filename=paste0(paste0(dir.name(),"/BSM/outputs/",nm,"/","Stock_size."),device_),plot=run_pictures$pic_C, device =device_, width = 16, height =10, units = "cm",  dpi = 300)
+      # ggsave(filename=paste0(paste0(dir.name(),"/BSM/outputs/",nm,"/","Exploitation_rate."),device_),plot=run_pictures$pic_D, device =device_, width = 16, height =10, units = "cm",  dpi = 300)
+      # 
+      # ggsave(filename=paste0(paste0(dir.name(),"/BSM/outputs/",nm,"/","Equilibrium_curve."),device_),plot=run_pictures$pic_E, device =device_, width = 16, height =10, units = "cm",  dpi = 300)
+      # ggsave(filename=paste0(paste0(dir.name(),"/BSM/outputs/",nm,"/","Kobe_plot."),device_),plot=run_pictures$pic_F, device =device_, width = 16, height =10, units = "cm",  dpi = 300)
+      # ggsave(filename=paste0(paste0(dir.name(),"/BSM/outputs/",nm,"/","Management_graphs."),device_),plot=run_pictures$pic_G, device =device_, width = 16, height =10, units = "cm",  dpi = 300)
+      # ggsave(filename=paste0(paste0(dir.name(),"/BSM/outputs/",nm,"/","prior_posterior_distributions."),device_),plot=run_pictures$pic_H, device =device_, width = 16, height =10, units = "cm",  dpi = 300)
+      # save(ABC_object,  file =paste0(dir.name(),"/BSM/outputs/",nm,"/","ABC_obj_",gsub(" ", "_",fstc()[["input"]][["Stock_info"]][["ScientificName"]]), "_",Sys.Date(), ".RData"))
+      # write.csv(cbind(fstc()[["input"]][["Stock_info"]],fstc()[["input"]][["Input_parameters"]]), paste0(dir.name(),"/BSM/outputs/",nm,"/input_parameters.csv"), row.names = F)
+      # write.csv(ABC_object[["output"]][["output_timeseries"]], paste0(dir.name(),"/BSM/outputs/",nm,"/output_timeseries.csv"), row.names = TRUE)
+      write.csv(ABC_FW(), paste0(dir.name(),"/BSM/outputs/",nm,"/output_FORWARDs.csv"), row.names = TRUE)
+      
+      #  write.csv(ABC_object[["output"]][["output_posteriors"]], paste0(dir.name(),"/BSM/outputs/",nm,"/output_posteriors.csv"), row.names = TRUE)
+      
+      Save_done <- showNotification(paste("Message: ", "The forecast outcomes are saved in your working directory"), duration = 10)
+      
+    })
+    
+    
     
     output$interim_text <-renderText({
       req(ABC_FW())

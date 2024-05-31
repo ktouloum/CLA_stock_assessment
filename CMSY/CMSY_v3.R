@@ -2064,23 +2064,35 @@ library(shinycssloaders)
                                 shiny::fluidRow(
                                   conditionalPanel(condition = "input.prepare_data",
                                                    shinydashboard::valueBoxOutput("Stock_infobox_patience",width = 12))),
-                                shiny::fluidRow( shiny::h3("A. Establish connection to FishBase or SeaLifeBase")),
-                                shiny::fluidRow(
-                                  conditionalPanel(condition = "input.prepare_data",
-                                                   shinydashboard::box(collapsible = F,
-                                                                       # uiOutput("cond_ifmany"),
-                                                                       shinyWidgets::actionBttn(inputId="procc_rpriors",label ="Connect",
-                                                                                                style = "unite",size = "md",icon = shiny::icon("paper-plane"),
-                                                                                                no_outline=F,block=F,color="primary"),
-                                                                       shinyBS::bsTooltip("procc_rpriors", title="Press to proceed to the next step",
-                                                                                          placement = "bottom", trigger = "hover",
-                                                                                          options = NULL),width = 4
-                                                   )),
-                                  conditionalPanel(condition = "input.procc_rpriors",
-                                                   shinycssloaders::withSpinner(shinydashboard::valueBoxOutput("Stock_infobox_3",width = 8)))
-                                ),
-                                shiny::fluidRow(
-                                  conditionalPanel(condition = "input.procc_rpriors",shiny::h3("B. Select r prior"))),
+                                shiny::fluidRow( shiny::h3("Select resilience - r priors")),
+                                shiny::fluidRow( column(width = 4,
+                                                        conditionalPanel(condition = "input.prepare_data",
+                                                                         shinydashboard::box(collapsible = F,
+                                                                                             # uiOutput("cond_ifmany"),
+                                                                                             shinyWidgets::actionBttn(inputId="procc_rpriors",label ="Start",
+                                                                                                                      style = "unite",size = "md",icon = shiny::icon("paper-plane"),
+                                                                                                                      no_outline=F,block=F,color="primary"),
+                                                                                             shinyBS::bsTooltip("procc_rpriors", title="Press to proceed to the next step",
+                                                                                                                placement = "bottom", trigger = "hover",
+                                                                                                                options = NULL),width = 12
+                                                                         ))),
+                                                 column(width = 4,
+                                                        conditionalPanel(condition = "input.procc_rpriors",
+                                                                         shinycssloaders::withSpinner(shinydashboard::valueBoxOutput("Stock_infobox_3",width = 12)))
+                                                 ),       
+                                                 column(width = 4,
+                                                        conditionalPanel(condition ="input.procc_rpriors",
+                                                                         #shinydashboard::valueBoxOutput("Stock_infobox_patience",width = 4),
+                                                                         shinydashboard::box(collapsible = F,align="center",background="green",
+                                                                                             # uiOutput("cond_ifmany"),
+                                                                                             shiny::h4("Press 'Connect' to establish connection to FishBase or SeaLifeBase to get information on resilience and r priors for your stock"),
+                                                                                             shinyWidgets::actionBttn(inputId="con_fbase",label ="Connect",
+                                                                                                                      style = "unite",size = "md",icon = shiny::icon("info"),
+                                                                                                                      no_outline=F,block=F,color="success"),
+                                                                                             shinyBS::bsTooltip("con_fbase", title="Press to proceed to the next step",
+                                                                                                                placement = "bottom", trigger = "hover",
+                                                                                                                options = NULL),width = 12
+                                                                         )))), 
                                 shiny::fluidRow(
                                   conditionalPanel(condition = "input.procc_rpriors",
                                                    shinydashboard::box(collapsible = F,
@@ -2088,15 +2100,15 @@ library(shinycssloaders)
                                                                        shinyWidgets::prettySwitch(
                                                                          inputId = "Acc_FBpriors",
                                                                          label = "Edit",
-                                                                          slim = T,
-                                                                         value = FALSE,status = "info" ),
+                                                                         slim = T,
+                                                                         value = T,status = "info" ),
                                                                        helpText("Note: The Resilience classification from FishBase/SeaLifeBase provides a general and often best first prior range for r and is used as default. You can manually change that range if better data are available. Note that High resilience only applies to species which reproduce within their first year."),
                                                                        conditionalPanel(condition = "input.Acc_FBpriors",
                                                                                         selectInput("resilience_in","Resilience",
                                                                                                     choices=c("","Very low","Low","Medium","High"),
                                                                                                     selected = ""),
                                                                                         helpText("Note: Very low: 0.015-0.01. Low: 0.05-0.5. Medium: 0.2-0.8. High: 0.6-1.5."),
-                                                                                        sliderInput("priors_rrange", "r prior range",
+                                                                                        sliderInput("priors_rrange", "r priors range",
                                                                                                     min = 0, max = 1.5, value = c(0.2, 0.8),step=0.01,sep = ""),
                                                                                         helpText("Note: r low and r high priors are an optional set of parameters to specify the range of intrinsic growth rate for the selected species. If no values are provided, the range will be based on Resilience. If values are given, the Resilience choise will be ignored.")
                                                                        ),
@@ -2105,13 +2117,14 @@ library(shinycssloaders)
                                                                          label = " Accept r prior and continue",
                                                                          status = "primary"),
                                                                        width=4)),
+                                  conditionalPanel(condition = "input.con_fbase",
+                                                   shinycssloaders::withSpinner(shinydashboard::valueBoxOutput("FB_resil",width =5))),
                                   conditionalPanel(condition = "input.procc_rpriors",
-                                                   shinydashboard::valueBoxOutput("FB_resil",width =5),
                                                    shinydashboard::valueBoxOutput("Res_rpriors",width = 3))
                                 ),
                                 fluidRow(
                                   conditionalPanel(condition = "input.Acc_rpriors",
-                                                   h3("C. Select other priors. Start by setting prior of relative stock size (B/k) for a selected year"))),
+                                                   h3("Select other priors. Start by setting prior of relative stock size (B/k) for a selected year"))),
                                 shiny::fluidRow(
                                   conditionalPanel(condition = "input.Acc_rpriors",
                                                    shinydashboard::box(collapsible = F,
@@ -2129,7 +2142,7 @@ library(shinycssloaders)
                                                                                                                                  ".csv")),
                                                                                                             width=12)),width=4),
                                                    uiOutput("LBB_message")
-
+                                                   
                                   )),
                                 shiny::fluidRow(
                                   tags$head(
@@ -2204,7 +2217,7 @@ library(shinycssloaders)
                                                      status = "primary"))),
                                 fluidRow(
                                   conditionalPanel(condition = "input.Priors_but2",
-                                                   h3("D. Compare expert priors with neural network priors based on catch pattern"))),
+                                                   shiny::h4("Compare your initial prior settings with the pattern proposed by a neural network (ANN) based on the catch pattern. Note that the ANN pattern may not apply to your stock and that especially the first year may be wrong because ANN cannot distinguish between early low catches stemming from low effort (= nearly unexploited B/k) or previous overfishing (= very low B/k)."))),
                                 shiny::fluidRow(conditionalPanel(condition = "input.Priors_but2",
                                                                  shiny::h5("Compare your initial prior settings with the pattern proposed by a neural network (ANN) based on the catch pattern. Note that the ANN pattern may not apply to your stock and that especially the first year may be wrong because ANN cannot distinguish between early low catches stemming from low effort (= nearly unexploited B/k) or previous overfishing (= very low B/k)."))),
                                 shiny::fluidRow(
@@ -3016,7 +3029,7 @@ library(shinycssloaders)
     #########SELECT STOCK TO WORK WITH PRIORS
 
     output$Stock_infobox_patience=shinydashboard::renderValueBox({
-      shinydashboard::valueBox( shiny::h4("Start priors processing"),shiny::h5("Press 'Connect' button to connect to FishBase or SeaLifeBase
+      shinydashboard::valueBox( shiny::h4("Start priors processing"),shiny::h5("Press 'Start' to enter resilience and r priors. You will also have the option to press 'Connect' button to connect to FishBase or SeaLifeBase
                                                                              for extraction of prior information. You will then have the
                                                                              option to edit that information. Be patient since establishing the
                                                                              connection may take a moment. Wait until the 'FishBase/SeaLifeBase info' box appears. If there is no Internet connection, a message will appear and you can enter the r-prior manually.
@@ -3031,14 +3044,14 @@ library(shinycssloaders)
         ))),
         icon = shiny::icon("thumbs-up", lib = "glyphicon"),color = "light-blue") })
 
-    Fishbase_text=eventReactive(input$procc_rpriors,{
+    Fishbase_text=eventReactive(input$con_fbase,{
       req(Final_stock())
       results= fbsb(Final_stock()[["Catch_ID"]][1,"ScientificName"])
       return(results)
     })
 
 
-    url_r=eventReactive(input$procc_rpriors,{
+    url_r=eventReactive(input$con_fbase,{
       url= a("Link", href=Fishbase_text()[6],style = "color:black") })
 
     output$FB_resil=shinydashboard::renderValueBox({

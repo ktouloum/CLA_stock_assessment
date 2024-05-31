@@ -997,7 +997,7 @@ shinyUI <- shinydashboard::dashboardPage(skin = "green",
                                                               status = "info" ),
                                                             conditionalPanel(condition = "input.upMaterial1",
                                                                              sliderInput("CPUE_yr_slct", "",
-                                                                                         min = 1900, max = 2023, value = c(1950, 2023),step=1,sep = "")),
+                                                                                         min = 1900, max = 2028, value = c(1950, 2028),step=1,sep = "")),
                                                             helpText("Note: Select start and end year such that you trust that the data are reasonable."),
                                                             tags$b("Add effort creep"),
                                                             shinyWidgets::prettySwitch(
@@ -1009,7 +1009,7 @@ shinyUI <- shinydashboard::dashboardPage(skin = "green",
                                                             conditionalPanel(condition = "input.ecreepyes",
                                                                              uiOutput("help_ecreep"),
                                                                              sliderInput("ecreep_year", "Set starting year for e-creep",
-                                                                                         min = 1900, max = 2023, value = 2000,step=1,sep = ""),      
+                                                                                         min = 1900, max = 2028, value = 2000,step=1,sep = ""),      
                                                                              helpText("Note: Choose the year from which the ecreep effect starts. Consider that the first sonars became available in the 1970s, the first GPS units in the 1980s, cheap fish finders and chart plotters after 2000."),
                                                                              sliderInput("ecreepslider", "% value",
                                                                                          min = 0, max = 5, value = c(2),step=0.5,sep = "")
@@ -1041,59 +1041,70 @@ shinyUI <- shinydashboard::dashboardPage(skin = "green",
       ###################### PAGE 5 PRIOR ENTRY  #####################
       ################################################################
       tabItem(tabName = "priors",
-              fluidRow(
-                conditionalPanel(condition = "input.button_1 |input.button_2",
-                                 shinydashboard::valueBoxOutput("Stock_infobox_patience",width = 8))),
-              fluidRow( h3("A. Confirm stock selection")),
-               fluidRow(
-                conditionalPanel(condition = "input.button_1 |input.button_2",
+              shiny::fluidRow(
+                conditionalPanel(condition = "input.prepare_data",
+                                 shinydashboard::valueBoxOutput("Stock_infobox_patience",width = 12))),
+              shiny::fluidRow( shiny::h3("Select resilience - r priors")),
+              shiny::fluidRow( column(width = 4,
+                                      conditionalPanel(condition = "input.prepare_data",
+                                                       shinydashboard::box(collapsible = F,
+                                                                           # uiOutput("cond_ifmany"),
+                                                                           shinyWidgets::actionBttn(inputId="procc_rpriors",label ="Start",
+                                                                                                    style = "unite",size = "md",icon = shiny::icon("paper-plane"),
+                                                                                                    no_outline=F,block=F,color="primary"),
+                                                                           shinyBS::bsTooltip("procc_rpriors", title="Press to proceed to the next step",
+                                                                                              placement = "bottom", trigger = "hover",
+                                                                                              options = NULL),width = 12
+                                                       ))),
+                               column(width = 4,
+                                      conditionalPanel(condition = "input.procc_rpriors",
+                                                       shinycssloaders::withSpinner(shinydashboard::valueBoxOutput("Stock_infobox_3",width = 12)))
+                               ),       
+                               column(width = 4,
+                                      conditionalPanel(condition ="input.procc_rpriors",
+                                                       #shinydashboard::valueBoxOutput("Stock_infobox_patience",width = 4),
+                                                       shinydashboard::box(collapsible = F,align="center",background="green",
+                                                                           # uiOutput("cond_ifmany"),
+                                                                           shiny::h4("Press 'Connect' to establish connection to FishBase or SeaLifeBase to get information on resilience and r priors for your stock"),
+                                                                           shinyWidgets::actionBttn(inputId="con_fbase",label ="Connect",
+                                                                                                    style = "unite",size = "md",icon = shiny::icon("info"),
+                                                                                                    no_outline=F,block=F,color="success"),
+                                                                           shinyBS::bsTooltip("con_fbase", title="Press to proceed to the next step",
+                                                                                              placement = "bottom", trigger = "hover",
+                                                                                              options = NULL),width = 12
+                                                       )))), 
+              shiny::fluidRow(
+                conditionalPanel(condition = "input.procc_rpriors",
                                  shinydashboard::box(collapsible = F,
-                                    shinyWidgets::actionBttn(inputId="procc_rpriors",label ="Connect",
-                                                style = "unite",size = "md",icon = icon("paper-plane"),
-                                                no_outline=F,block=F,color="success"),
-                                    shinyBS::bsTooltip("procc_rpriors", title="Press to proceed to the next step",
-                                               placement = "bottom", trigger = "hover",
-                                               options = NULL),
-                                    width = 4)
-                                 ),
+                                                     tags$b("Change r prior"),
+                                                     shinyWidgets::prettySwitch(
+                                                       inputId = "Acc_FBpriors",
+                                                       label = "Edit",
+                                                       slim = T,
+                                                       value = T,status = "info" ),
+                                                     helpText("Note: The Resilience classification from FishBase/SeaLifeBase provides a general and often best first prior range for r and is used as default. You can manually change that range if better data are available. Note that High resilience only applies to species which reproduce within their first year."),
+                                                     conditionalPanel(condition = "input.Acc_FBpriors",
+                                                                      selectInput("resilience_in","Resilience",
+                                                                                  choices=c("","Very low","Low","Medium","High"),
+                                                                                  selected = ""),
+                                                                      helpText("Note: Very low: 0.015-0.01. Low: 0.05-0.5. Medium: 0.2-0.8. High: 0.6-1.5."),
+                                                                      sliderInput("priors_rrange", "r priors range",
+                                                                                  min = 0, max = 1.5, value = c(0.2, 0.8),step=0.01,sep = ""),
+                                                                      helpText("Note: r low and r high priors are an optional set of parameters to specify the range of intrinsic growth rate for the selected species. If no values are provided, the range will be based on Resilience. If values are given, the Resilience choise will be ignored.")
+                                                     ),
+                                                     shinyWidgets::materialSwitch(
+                                                       inputId = "Acc_rpriors",
+                                                       label = " Accept r prior and continue",
+                                                       status = "primary"),
+                                                     width=4)),
+                conditionalPanel(condition = "input.con_fbase",
+                                 shinycssloaders::withSpinner(shinydashboard::valueBoxOutput("FB_resil",width =5))),
                 conditionalPanel(condition = "input.procc_rpriors",
-                                 shinycssloaders::withSpinner(valueBoxOutput("Stock_infobox_3",width = 8)
-                                                              )
-                                 )
-                ),
-              fluidRow(
-                conditionalPanel(condition = "input.procc_rpriors",h3("B. Select r prior"))),
-              fluidRow(
-                conditionalPanel(condition = "input.procc_rpriors",
-                                 shinydashboard::box(collapsible = F,
-                                     tags$b("Change r prior"),
-                                     shinyWidgets::prettySwitch(
-                                       inputId = "Acc_FBpriors",
-                                       label = "Edit",
-                                       slim = T,
-                                       value = FALSE,status = "info" ),
-                                     helpText("Note: The Resilience classification from FishBase/SeaLifeBase provides a general and often best first prior range for r and is used as default. You can manually change that range if better data are available."),
-                                     conditionalPanel(condition = "input.Acc_FBpriors",
-                                                      selectInput("resilience_in","Resilience",
-                                                                  choices=c("","Very low","Low","Medium","High"),
-                                                                  selected = ""),
-                                                      helpText("Note: Very low: 0.015-0.01. Low: 0.05-0.5. Medium: 0.2-0.8. High: 0.6-1.5."),
-                                                      sliderInput("priors_rrange", "r prior range",
-                                                                  min = 0, max = 1.5, value = c(0.2, 0.8),step=0.01,sep = ""),
-                                                      helpText("Note: r low and r high priors are an optional set of parameters to specify the range of intrinsic growth rate for the selected species. If no values are provided, the range will be based on Resilience. If values are given, the Resilience choise will be ignored.")
-                                                      ),
-                                     shinyWidgets::materialSwitch(
-                                       inputId = "Acc_rpriors",
-                                       label = " Accept r prior and continue",
-                                       status = "success"),
-                                     width=4)),
-                conditionalPanel(condition = "input.procc_rpriors",
-                                shinydashboard::valueBoxOutput("FB_resil",width =5),
                                  shinydashboard::valueBoxOutput("Res_rpriors",width = 3))
               ),
               fluidRow(
                 conditionalPanel(condition = "input.Acc_rpriors",
-                                          h3("C. Select other priors. Start by setting prior of relative stock size (B/k) for a selected year"))),
+                                 h3("Select other priors. Start by setting prior of relative stock size (B/k) for a selected year"))),
               shiny::fluidRow(
                 conditionalPanel(condition = "input.Acc_rpriors",
                                         shinydashboard::box(collapsible = F,
@@ -1153,7 +1164,7 @@ shinyUI <- shinydashboard::dashboardPage(skin = "green",
                                                                            #  helpText("Note: Very low: 0.01-0.2. Low: 0.01-0.4. Medium: 0.2-0.6. Sustainable: 0.4-0.8. Unexploited: 0.75-1.0."),
                                                                              textOutput("calc_Bk_int"),
                                                                              sliderInput("man_Bk_int_year", "Int. year",
-                                                                                         min = 1900, max = 2023, value = 2020,step=1,sep = ""),
+                                                                                         min = 1900, max = 2028, value = 2020,step=1,sep = ""),
                                                                              sliderInput("man_Bk_int", "",
                                                                                          min = 0, max = 1.5, value = c(0.4, 0.8),step=0.01,sep = "")),
                                                             tags$b("Change B/k prior for end year"),
@@ -1186,7 +1197,7 @@ shinyUI <- shinydashboard::dashboardPage(skin = "green",
                 status = "success"))),
               fluidRow(
                 conditionalPanel(condition = "input.go_to_d",
-                                 h3("D. Select single B/k prior to be used by AMSY"))),
+                                 h3("Select single B/k prior to be used by AMSY"))),
                 fluidRow(
                 column(width=4,
                        fluidRow(width=12,
@@ -1207,7 +1218,7 @@ shinyUI <- shinydashboard::dashboardPage(skin = "green",
                                                                                       ),
                                                                                       conditionalPanel(condition = "input.Id004=='Set B/k prior manually'",                    
                                                                                                     sliderInput("bk_priors_year", "Set B/k prior year",
-                                                                                                  min = 1900, max = 2023, value = 2000,step=1,sep = ""),      
+                                                                                                  min = 1900, max = 2028, value = 2000,step=1,sep = ""),      
                                                                                       selectInput("bk_priors","Set priors of relative stock size (B/k) for the selected year",
                                                                                                   choices= c("","Unexploited, 0.75-1.0", "Sustainable, 0.4-0.8", "Medium, 0.2-0.6", "Low, 0.01-0.4","Very low, 0.01-0.2"),
                                                                                                   selected =  ""),
@@ -1886,14 +1897,14 @@ shinyServer=function(input, output, session){
   # 
   #########SELECT STOCK TO WORK WITH PRIORS
   observeEvent(input$button_1,{   #TRICK to erase things
-    shinyWidgets::updatePrettySwitch(session, "Acc_FBpriors", value = F)
+    shinyWidgets::updatePrettySwitch(session, "Acc_FBpriors", value = T)
     shinyWidgets::updateMaterialSwitch(session, "Acc_rpriors", value = F)
     shinyWidgets::updateMaterialSwitch(session, "go_to_d", value = F)
    # reset("FB_resil")
     })
   
   observeEvent(input$button_2,{   #TRICK to erase things
-    shinyWidgets::updatePrettySwitch(session, "Acc_FBpriors", value = F)
+    shinyWidgets::updatePrettySwitch(session, "Acc_FBpriors", value = T)
     shinyWidgets::updateMaterialSwitch(session, "Acc_rpriors", value = F)
     shinyWidgets::updateMaterialSwitch(session, "go_to_d", value = F)
    # reset("FB_resil")
@@ -1905,7 +1916,7 @@ shinyServer=function(input, output, session){
   }) 
 
     output$Stock_infobox_patience=shinydashboard::renderValueBox({
-    shinydashboard::valueBox( shiny::h4("Start priors processing"),shiny::h5("Press 'Connect' button to connect to FishBase or SeaLifeBase 
+      shinydashboard::valueBox( shiny::h4("Start priors processing"),shiny::h5("Press 'Start' to enter resilience and r priors. You will also have the option to press 'Connect' button to connect to FishBase or SeaLifeBase
                                                                              for extraction of prior information. You will then have the 
                                                                              option to edit that information. Be patient since the 
                                                                              connection may take a moment. 
@@ -1924,7 +1935,7 @@ shinyServer=function(input, output, session){
 
   
 # 
-  Fishbase_text=eventReactive(input$procc_rpriors,{
+  Fishbase_text=eventReactive(input$con_fbase,{
     req(Final_stock())
     results= fbsb(Final_stock()[["CPUE_ID"]][1,"ScientificName"])
     return(results)
