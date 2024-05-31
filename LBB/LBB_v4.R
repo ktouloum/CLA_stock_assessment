@@ -202,7 +202,6 @@ fbsb_table_2 <- function(spec.code) {
   return(Table2)
 }
 
-
 fbsb_table_mat <- function(spec.code) {
   Bpage_a=paste0("https://www.fishbase.se/Reproduction/MaturityList.php?ID=",spec.code)
   Bpage_b=paste0("https://www.fishbase.ca/Reproduction/MaturityList.php?ID=",spec.code)
@@ -347,7 +346,6 @@ BH <- function(AllLength,Linf,MK,FK,GausSel,selpar1,selpar2) {
 # Function to aggregate data by year
 #------------------------------------------------------------
 AG  <- function(dat) { # where dat contains dat$Year, dat$Length in cm, dat$CatchNo
-  
   # aggregate normalized annual LFs by weighing with square root of sample size
   # get sum of frequencies per year
   sum.Ny  <- aggregate(Freq~Year,dat,sum)$Freq  
@@ -415,7 +413,6 @@ LBB.AG  <- function(df,Sel.yrs,width,L.width=1,L.cut) {#,munit
   #--------------------------------------------------------------------------------------
   df_        <- as.data.frame(df[,c("Year","Length","CatchNo")])
   names(df_) <- c("Year","Length","Freq")
-  
   LF.all    <- AG(dat=df_) # function to aggregate data by year
   # standardize to max Freq
   LF.all$Freq = LF.all$Freq/max(LF.all$Freq) 
@@ -423,7 +420,6 @@ LBB.AG  <- function(df,Sel.yrs,width,L.width=1,L.cut) {#,munit
   LF.all     <- LF.all[which(LF.all$Freq>0)[1] : length(LF.all$Length),]
   # remove trailing empty records
   LF.all     <- LF.all[1 : which(LF.all$Length==max(LF.all$Length[LF.all$Freq>0])),]
-  
   return(LF.all)
 }
 
@@ -520,8 +516,6 @@ Run.nls= function(LF.all,Linf.user,Linf.user.CV,Lstart) {
                              Linf.nls.sd,
                              L10)
   outcomes[["model"]]=c(ZK.mod)
-  
-  
   return(outcomes)
 }  
 
@@ -529,11 +523,8 @@ Run.nls= function(LF.all,Linf.user,Linf.user.CV,Lstart) {
 
 LBB.obj.create   <- function(df,Species,Name,Sel.yrs,width,L.width=1,L.cut,Run.nls.obj,MK.user,MK.user.CV,Lstart.obj,GausSel,semelp,MergeLF,Lm50.user,Lmean.user,LmeanCV.user) {#,munit
   Stock=unique(df$Stock)
-  
   df=df[df$Year %in% Sel.yrs,]
-  
   L.width=as.numeric(L.width)
-  
   if (L.width==1) {
     df=df
   } else if (L.width>1) {
@@ -545,7 +536,6 @@ LBB.obj.create   <- function(df,Species,Name,Sel.yrs,width,L.width=1,L.cut,Run.n
     ###LENGTH_CLASS & make the necessary dataframes, we do not take into account the season and depth since sample is small
     #Selectivity$LC=floor(Selectivity$Total.Length..cm.)+0.5
     df$LC=as.numeric(as.character(cut(df$Length,breaks =classes,labels = clasnms,right = F )))
-    
     df=aggregate(CatchNo   ~Stock +Year +LC , data = df, sum)
     colnames(df)= c("Stock",   "Year","Length",  "CatchNo")
   }
@@ -558,14 +548,10 @@ LBB.obj.create   <- function(df,Species,Name,Sel.yrs,width,L.width=1,L.cut,Run.n
   df_=df[df$CatchNo>0,]
   df_$max_l=ave(df_$Length,df_$Year,FUN=max)
   df_= unique(df_[,c("Year","max_l")])
-  
   median_max_length=median(df_$max_l,na.rm = T)
-  
   df=df[,2:4]
   df=df[df$CatchNo>0,]
-  
   LBB_object=list()
-  
   LBB_object[["input.data"]]=df
   LBB_object[["model.param"]]=data.frame(Stock=Stock,Species=Species, Name=Name,max_length=max_length,median_max_length=median_max_length,
                                          width=width,L.width=L.width,L.cut=L.cut,MK.user=MK.user,MK.user.CV=MK.user.CV,
@@ -588,7 +574,6 @@ LBB.fit   <- function(LBB.obj) {
   df_ALL=LBB.obj[["input.data"]]
   df_ALL$CatchNo[df_ALL$Length<=LBB.obj[["model.param"]]$L.cut]=0
   df_ALL=df_ALL[df_ALL$Length<= LBB.obj[["model.param"]]$Linf.nls,]
-  
   df_mat=LBB.obj[["input.data"]]
   
   
@@ -629,7 +614,6 @@ LBB.fit   <- function(LBB.obj) {
     # get vectors
     L.y         <- LF.y$Length
     r.Freq.y    <- LF.y$Freq
-    
     # fill remaining zero frequencies with very small number, to avoid error
     r.Freq.y[r.Freq.y==0] <- min(r.Freq.y[r.Freq.y>0],na.rm=T)/100
     
@@ -661,8 +645,7 @@ LBB.fit   <- function(LBB.obj) {
     ####################### FOR MATURITY
     ####################### FOR MATURITY
     ####################### FOR MATURITY
-    
-    
+
     # enter data for this year into data frame
     # 
     
@@ -784,9 +767,7 @@ LBB.fit   <- function(LBB.obj) {
       Ldat$Linf[i]    <- median((jagsfitSLN$BUGSoutput$sims.list$Linf.d))
       Ldat$Linf.lcl[i]  <- quantile(jagsfitSLN$BUGSoutput$sims.list$Linf.d,0.025)
       Ldat$Linf.ucl[i]  <- quantile(jagsfitSLN$BUGSoutput$sims.list$Linf.d,0.975)
-      
     }
-    
     if(GausSel==TRUE) {
       # determine priors
       # assume length at peak Freq as mean and distance to length at 80% of peak as SD of mean
@@ -796,9 +777,7 @@ LBB.fit   <- function(LBB.obj) {
       SD.st      <-LmeanCV.user# max(GLmean.st-Lc.pr,0.25*GLmean.st)
       
       # cat("Running Jags model to fit SL and N distributions for gillnet-like selection\n")
-      
       n.L <- length(L.y)
-      
       jags.data <- list ("n.L","GLmean.st","L.y","SD.st","ZK.nls","r.Freq.y","Linf.pr","Linf.sd.pr","MK.pr")
       jags.params <- c("GLmean.d","SD.d","SL","xN","FK.d","MK.d","Linf.d","Freq.pred")
       
@@ -855,7 +834,6 @@ LBB.fit   <- function(LBB.obj) {
                                   parameters.to.save=jags.params, 
                                   model.file=paste(MODEL), 
                                   n.burnin=300, n.thin=10, n.iter=1000, n.chains=3)
-      
       jagsFit<-c(jagsFit,jagsfitSLN$BUGSoutput$pD) #modification by GP to select the best year according to the Deviance information criterion
       
       # use median and percentiles
@@ -884,9 +862,7 @@ LBB.fit   <- function(LBB.obj) {
       Ldat$Linf[i]      <- median((jagsfitSLN$BUGSoutput$sims.list$Linf.d))
       Ldat$Linf.lcl[i]  <- quantile(jagsfitSLN$BUGSoutput$sims.list$Linf.d,0.025)
       Ldat$Linf.ucl[i]  <- quantile(jagsfitSLN$BUGSoutput$sims.list$Linf.d,0.975)
-      
     } # end of gillnet loop
-    
     
     # get MSFD D3.3 indicators
     Ldat$L95[i]      <- wtd.quantile(x=L.y.mat,weights=r.Freq.y.mat,probs=c(0.95))
@@ -911,9 +887,7 @@ LBB.fit   <- function(LBB.obj) {
   LBB.obj[["model.param"]]$r.alpha.pr=ifelse(GausSel==F,r.alpha.pr,NA)
   LBB.obj[["model.param"]]$r.alpha.sd.pr=ifelse(GausSel==F,r.alpha.sd.pr,NA)
   LBB.obj[["jagsFit"]]=jagsFit
-  
   return(LBB.obj)
-  
 }
 
 Bad.years=function(LBB.fit.obj) {
@@ -944,7 +918,6 @@ Bad.years=function(LBB.fit.obj) {
   return(by.table)
 }
 
-
 BH.fit <- function(LBB.fit.obj) {
   i = 0 # start counter
   df_ALL=LBB.fit.obj[["input.data"]]
@@ -953,7 +926,6 @@ BH.fit <- function(LBB.fit.obj) {
   nYears=length(unique(df_ALL$Year))
   GausSel=LBB.fit.obj[["model.param"]]$GausSel
   semelp=LBB.fit.obj[["model.param"]]$Semelparous
-  
   #Lfit       <- matrix(list(),nYears,3) 
   for(Year in Years) {
     i = i+1 # i is the index of Year
@@ -961,15 +933,12 @@ BH.fit <- function(LBB.fit.obj) {
     df=df_ALL[df_ALL$Year==Year,]
     names(df) <- c("Year","Length","Freq")
     # Error propagation, assuming that fractional uncertainties add in quadrature  
-    
     rel.lcl <- sqrt(((Ldat$FM[i]-Ldat$FM.lcl[i])/Ldat$FM[i])^2+((Ldat$MK[i]-Ldat$MK.lcl[i])/Ldat$MK[i])^2+((Ldat$FK[i]-Ldat$FK.lcl[i])/Ldat$FK[i])^2+((Ldat$Linf[i]-Ldat$Linf.lcl[i])/Ldat$Linf[i])^2)
     rel.ucl <- sqrt(((Ldat$FM.ucl[i]-Ldat$FM[i])/Ldat$FM[i])^2+((Ldat$MK.ucl[i]-Ldat$MK[i])/Ldat$MK[i])^2+((Ldat$FK.ucl[i]-Ldat$FK[i])/Ldat$FK[i])^2+((Ldat$Linf.ucl[i]-Ldat$Linf[i])/Ldat$Linf[i])^2)   
-    
     
     BH.list  <- BH(AllLength=unique(df$Length),Linf=Ldat$Linf[i],MK=Ldat$MK[i],FK=Ldat$FK[i],GausSel=GausSel,
                    selpar1=ifelse(GausSel==T,Ldat$GLmean[i]/Ldat$Linf[i],Ldat$Lc[i]/Ldat$Linf[i]),#Ldat$Lc[i]/Ldat$Linf[i],  
                    selpar2= ifelse(GausSel==T,Ldat$SD[i]/Ldat$Linf[i],Ldat$r.alpha[i]))#Ldat$r.alpha[i]) 
-    
     if(semelp==F) {
       Ldat$BB0[i]  <- as.numeric(BH.list[1])
       Ldat$YR[i]   <- as.numeric(BH.list[2]) } else { 
@@ -986,7 +955,6 @@ BH.fit <- function(LBB.fit.obj) {
     Ldat$YR.ucl[i] <- Ldat$YR[i]+Ldat$YR[i]*rel.ucl
   }
   LBB.fit.obj[["model.outcomes"]]=Ldat
-  
   return(LBB.fit.obj)
 }
 
@@ -1036,7 +1004,6 @@ median.rfpoints=function(BH.fit.obj) {
   if(semelp==F) {
     outcomes$BFM1B0       <- as.numeric(BFM1B0.list[1])
     outcomes$YRFM1        <- as.numeric(BFM1B0.list[2]) } else { 
-      
       # for semelparous species which die at/after Lopt, the concept of Lc_opt and YR at F=M and Lc=Lc_opt does not apply
       # instead, Bmsy is assumed at 0.5 B0, following the Schaefer model which makes no assumptions about size or age structure
       outcomes$BFM1B0 <- 0.5
@@ -1044,13 +1011,11 @@ median.rfpoints=function(BH.fit.obj) {
     }
   
   if(semelp==T) {LmeanFM <- NA} else {
-    
     if(GausSel==F) {
       LmeanFM      <- (2*  outcomes$Lc.med*  outcomes$MK.med+  outcomes$Linf.med)/(2*  outcomes$MK.med+1)} else {
         LmeanFM    <- (2*   BH.fit.obj[["model.param"]][["Lc.pr"]]*  outcomes$MK.med+  outcomes$Linf.med)/(2*  outcomes$MK.med+1)   } 
   }
   outcomes$LmeanFM        <-LmeanFM
-  
   BH.fit.obj[["median.ref.points"]]=outcomes
   return(BH.fit.obj)
 }
@@ -1058,7 +1023,6 @@ median.rfpoints=function(BH.fit.obj) {
 ploting.ts=function(BH.fit.obj,smooth.ts) {
   nYears=length(BH.fit.obj[["model.outcomes"]]$Year)
   GausSel=BH.fit.obj[["model.param"]]$GausSel
-  
   if(smooth.ts==TRUE && nYears>=3) {
     if(GausSel==F) {
       ploting_ts= data.frame(
@@ -1190,7 +1154,6 @@ ggplot.lc= function(BH_rfpoints,ts.obj) {
   GausSel=BH_rfpoints[["model.param"]]$GausSel
   semelp=BH_rfpoints[["model.param"]]$Semelparous
   Lm50.user=BH_rfpoints[["model.param"]]$Lm50.user
-  
   ref.points=BH_rfpoints[["median.ref.points"]]
   if (GausSel==F) {
     max.y=1.1*( max( c(ref.points$Lc_opt.med,ref.points$Lopt.med,ref.points$LmeanFM,ts.obj$Lmean.ts),na.rm = T)) 
@@ -1220,7 +1183,6 @@ ggplot.lc= function(BH_rfpoints,ts.obj) {
           }
     } else {
       if (Lm50.user==0) {
-        
         x=ggplot()+geom_line(data=ts.obj, aes(x=Year, y=Lmean.ts,col="A"),size=2)+
           geom_point(data=ts.obj, aes(x=Year, y=Lmean.ts,col="A"),size=2)+
           geom_hline(aes(yintercept= ref.points$Lopt.med,linetype="C"),size=1,color="darkgreen")+
@@ -1228,7 +1190,6 @@ ggplot.lc= function(BH_rfpoints,ts.obj) {
           scale_color_manual(values=c("black"),labels=c("Lmean"))+
           scale_linetype_manual(values=c("dashed","solid","dotted"),labels=c("Lc_opt","Lopt","F=M"))+
           theme_bw()+ theme(legend.position="bottom")+labs(x="Year",y="Length (cm)",colour="",linetype="")} else {
-            
             x=ggplot()+geom_line(data=ts.obj, aes(x=Year, y=Lmean.ts,col="A"),size=1)+
               geom_point(data=ts.obj, aes(x=Year, y=Lmean.ts,col="A"),size=2)+
               geom_hline(aes(yintercept= ref.points$Lopt.med,linetype="C"),size=1,color="darkgreen")+
@@ -1242,7 +1203,6 @@ ggplot.lc= function(BH_rfpoints,ts.obj) {
   } else {
     median(BH_rfpoints[["model.outcomes"]]$r.Lopt)
     max.y=1.1*( max( c( median(BH_rfpoints[["model.outcomes"]]$r.Lopt)*ref.points$Linf.med,ts.obj$GLmean.ts),na.rm = T)) 
-    
     if (Lm50.user==0) {
       x=ggplot()+geom_line(data=ts.obj, aes(x=Year, y=GLmean.ts,col="A"),size=2)+
         geom_hline(aes(yintercept= ref.points$Lopt.med,linetype="C"),size=1,color="darkgreen")+
@@ -1251,7 +1211,6 @@ ggplot.lc= function(BH_rfpoints,ts.obj) {
         scale_color_manual(values=c("black"),labels=c("Lmean"))+
         scale_linetype_manual(values=c("solid","dotted"),labels=c("Lopt","F=M"))+
         theme_bw()+ theme(legend.position="bottom")+labs(x="Year",y="Length (cm)",colour="",linetype="")} else {
-          
           x=ggplot()+geom_line(data=ts.obj, aes(x=Year, y=GLmean.ts,col="A"),size=2)+
             geom_hline(aes(yintercept= ref.points$Lopt.med,linetype="C"),size=1,color="darkgreen")+
             scale_y_continuous(limits = c(0,max.y))+
@@ -1278,7 +1237,6 @@ ggplot.fm= function(ts.obj) {
     theme_bw()+ theme(legend.position="bottom")+
     scale_y_continuous(limits = c(0,NA))+
     labs(x="Year",y="F/M",colour=" ",fill=" ",linetype="")
-  
   return(x)
 }
 
@@ -1286,7 +1244,6 @@ ggplot.bb0= function(BH.fit.obj,ts.obj) {
   ref.points=BH.fit.obj[["median.ref.points"]]
   semelp=BH.fit.obj[["model.param"]]$Semelparous
   GausSel=BH.fit.obj[["model.param"]]$GausSel
-  
   if (semelp==T) {
     txt_="proxy Bmsy for semelparous"} else {
       txt_="B F=M,Lc=opt"
@@ -1344,9 +1301,6 @@ ggplot.histMSFD= function(BH.fit.obj) {
 #----------------------------------------------
 # 
 #----------------------------------------------
-
-
-
 
 template_LBB_data_clnms =c(colnames(test_LBB_data))
 template_LBB_data = data.frame(matrix(nrow = 0, ncol = length(template_LBB_data_clnms)))
@@ -1423,7 +1377,6 @@ would have maximum biomass, and the asymptotic length (Linf)."))),background = "
                                 shiny::h5( HTML(paste0("Schematic representation of the length frequency distribution in commercial catch with trawl-like selectivity, with indication of the sections that are subject to no gear selection (dotted red curve), partial gear selection (solid red curve), and full gear selection (dashed red curve). LBB fits the red curve to length-frequency data and estimates Linf, Lc, Lopt, and Z/K (total mortality rate relative to somatic growth rate) from the red curve. With these parameters, Beverton and Holt's Yield/Recruit equations can be used to estimate relative stock size B/B0." ))),background = "light-blue",
                                 align="center", width = 12)
                               ), 
-                              
       ),
       ################################################################
       ###################### PAGE 2 UPLOAD DATA ######################
@@ -1702,7 +1655,7 @@ would have maximum biomass, and the asymptotic length (Linf)."))),background = "
                                                             tags$b("Note: from here on all lengths will be in cm"),
                                                             materialSwitch(
                                                               inputId = "Change_view",
-                                                              label = "Select graph type", 
+                                                              label = "Select graph view", 
                                                               value = FALSE,
                                                               status = "success"
                                                             ),
@@ -1913,10 +1866,7 @@ would have maximum biomass, and the asymptotic length (Linf)."))),background = "
                                shinycssloaders::withSpinner(shiny::plotOutput('Selectivity_plots')),
                                shiny::h5("A Trawl-like selection: The dashed blue curve indicates the proportion of individuals retained by the trawl if they encounter the trawl, as a function of individual body length: from about 30 cm onward, all individuals are retained. The black curve is an example of observed length frequencies, with the left-hand side showing the increased selectivity, from zero to one, and the right-hand side showing the decline in numbers caused by natural mortality plus fishing mortality."),
                                shiny::h5("B Gillnet-like selection: The dashed blue curve indicates the proportion of individuals retained by the gillnet if they encounter it, as a function of individual body length. Note that all fish of about 30 cm length will be retained, but some smaller ones as well larger ones will escape. The black curve is an example of observed length frequencies, with the left-hand side showing the increased selectivity, from zero to one, and the right-hand side showing the decline in numbers caused by natural mortality plus fishing mortality and by reduced selectivity of the gear.")
-                               
                                  ),
-              
-              
       ),
       ############ ############ ############
       ############ RUN MODEL UI ############
@@ -1983,7 +1933,6 @@ would have maximum biomass, and the asymptotic length (Linf)."))),background = "
                                                                               inline = FALSE, 
                                                                               status = "success"
                                                                             ),width = 12))),  
-                              
                                 column(width = 8,align="center",
                                                 conditionalPanel(condition = "input.Start_run",
                                                                  shinydashboard::box(collapsible = F,
@@ -1993,8 +1942,7 @@ would have maximum biomass, and the asymptotic length (Linf)."))),background = "
                                                                  shinydashboard::valueBoxOutput("success_LBB",width =12)
                                                                  )
                                        )
-                               
-                              ),
+                                ),
                               shinyBS::bsModal(id='modalExample3',
                                                title ='Selected object',
                                                trigger="see_obj",
@@ -2031,8 +1979,7 @@ would have maximum biomass, and the asymptotic length (Linf)."))),background = "
                                                           inputId = "smooth_ts_button",
                                                           label = "Smooth time series",
                                                           value = FALSE, 
-                                                          status = "success"
-                                                        ),
+                                                          status = "success"),
                                                         tags$b("Model outputs"),
                                                         tags$hr(style = "border-top: 3px solid #000000;"),
                                                         uiOutput("ModOutp_a1a"),
@@ -2052,7 +1999,6 @@ would have maximum biomass, and the asymptotic length (Linf)."))),background = "
                                                         uiOutput("ModOutp_a8a"),
                                                         uiOutput("ModOutp_a8b"),
                                                         uiOutput("ModOutp_a8c"),
-                                                        
                                                         uiOutput("ModOutp_a9"),
                                                         uiOutput("ModOutp_a10"),
                                                         uiOutput("ModOutp_a11"),
@@ -2062,7 +2008,6 @@ would have maximum biomass, and the asymptotic length (Linf)."))),background = "
                                                         uiOutput("ModOutp_a15"),
                                                         uiOutput("ModOutp_a16a"),
                                                         uiOutput("ModOutp_a16b"),
-                                                        
                                                         tags$hr(style = "border-top: 1px solid #999797;"),
                                                         uiOutput("ModOutp_a17"),
                                                         uiOutput("ModOutp_a17b"),
@@ -2145,10 +2090,7 @@ would have maximum biomass, and the asymptotic length (Linf)."))),background = "
                                        #                                        shinycssloaders::withSpinner(shiny::plotOutput("hist_plot")),
                                        #                                        shiny::h5("TEXT"),
                                        #                                        width = 12)))
-                                       
-                                       
                                        #,height = 320
-                                       
                                 )
                               )),
       shinydashboard::tabItem(tabName = "addit_info",
@@ -2156,41 +2098,37 @@ would have maximum biomass, and the asymptotic length (Linf)."))),background = "
                               shiny::fluidRow(shiny::h3(tags$b("References:")),
                                               shiny::h4(tagList("Froese R, Winker H, Coro G, Demirel N, Tsikliras AC, Dimarchopoulou D, Scarcella G, Probst W N, Dureuil M, Pauly D, 2018. A new approach for estimating stock status from length frequency data. ICES Journal of Marine Science, 75(6), 2004-2015. https://doi.org/10.1093/icesjms/fsy078"))),                              tags$hr(style = "border-top: 2px solid #000000;"),
                               shiny::fluidRow(shiny::h3(tags$b("Version:")),
-                                              shiny::h4("v1.01")),
+                                              shiny::h4("v1.04")),
                               tags$hr(style = "border-top: 2px solid #000000;"),
                               shiny::fluidRow(shiny::h3(tags$b("Issue tracking:")),
                                               shiny::h4("touloumisk@inale.gr")),
                               tags$hr(style = "border-top: 2px solid #000000;"),
                               #tags$hr(style = "border-top: 2px solid #000000;"),
                               #tableOutput("test_orf"), ######################
-                              shiny::fluidRow(shiny::h3(tags$b("ABC app team:"))),
-                              tags$hr(style = "border-top: 2px solid #000000;")
+                              # shiny::fluidRow(shiny::h3(tags$b("ABC app team:"))),
+                              # tags$hr(style = "border-top: 2px solid #000000;")
+                              )
       )
-                                           )
-                                         )
+    )
 )
 ############ ############ ############
 ############    SERVER    ############
 ############ ############ ############
 
 shinyServer=function(input, output, session){
-  
-  shinyWidgets::useSweetAlert()
+ 
+   shinyWidgets::useSweetAlert()
   #  shinyBS::toggleModal(session, "modalExample", toggle = "toggle")
-  
   Stock_obj <- reactiveValues()
   Stock_obj$Stocks=data.frame(ID=1:200,stock=rep(NA,200))
   Stock_obj$LBB_ID <- template_LBB_ID
   Stock_obj$LBB_data <- template_LBB_data
   shinyWidgets::useSweetAlert()
-  
-  
+
   ###### Update select tools
-  
   observe({
     updateTextInput(session, "Sp_Comm", value = species_DB$FBname[species_DB$Species==input$Sp_Scient])
   })
-  
   
   Common_name=reactive({
     xx=input$Sp_Comm
@@ -2199,11 +2137,9 @@ shinyServer=function(input, output, session){
   output$Sps_Info=shinydashboard::renderValueBox({
     shinydashboard::valueBox(
       shiny::h4("Species info"),shiny::h5(HTML(paste0("Scientific name: ", tags$b(tags$em(input$Sp_Scient)),br(),br(),
-                                                      "Common name: ",tags$b(input$Sp_Comm),br(),br()
-                                                      ))),
+                                                      "Common name: ",tags$b(input$Sp_Comm),br(),br()))),
       icon = shiny::icon("file-alt"),
       color = "light-blue") })
-  
   
   ###CREATE UPLOAD DATA
   inp_data_LBB <- reactive({
@@ -2288,8 +2224,7 @@ shinyServer=function(input, output, session){
     updateNumericInput(session, "length_width",label = paste0("Used length class width in ", input$unit_col))
     
   })
-  
-  
+
   # observeEvent(input$Upld_butt_1,{   #TRICK to erase things
   #   shinyWidgets::updateMaterialSwitch(session, "Upld_butt_3", value =F)
   # })
@@ -2349,7 +2284,6 @@ shinyServer=function(input, output, session){
     updatePrettyToggle(session,"semelparous2",  value =ifelse(test_LBB_ID[input$Exist_Stcks_tble_rows_selected,"Species"] %in% 
                                                               c("Illex coindetii", "Octopus vulgaris", "Sepia officinalis"),TRUE,FALSE)   # = getDefaultReactiveDomain(),
     )
-    
   })
   
   output$txtout1=shinydashboard::renderValueBox({
@@ -2357,24 +2291,19 @@ shinyServer=function(input, output, session){
       shiny::h4("Info"),shiny::h5(test_LBB_ID$Comment[test_LBB_ID$Stock==input$txt1]) ,
       icon = shiny::icon("info-circle"),
       color = "aqua") })
- 
- 
-  
+
   output$LBB_plot2= shiny::renderPlot({
     validate(
       need(input$txt1 %in% test_LBB_data$Stock, 'Choose a valid Stock from the last column of the above Data Table')
     )
-    
     ggplot(data=test_LBB_data[test_LBB_data$Stock==input$txt1,], aes(x=Length, y=as.factor(Year), height = CatchNo, group = as.factor(Year))) + 
       geom_density_ridges(stat = "identity", scale = 1,alpha=0.7,fill="#F8766D")+ggplot2::theme_classic()+ggplot2::labs(y="Year", x="LC",fill="")
-    
     # 
     # ggplot2::ggplot(data=test_LBB_data[test_LBB_data$Stock==input$txt1,], ggplot2::aes(x=yr, y=ct, group=1)) +
     #   ggplot2::geom_line(color="blue",size=1)+ggplot2::labs(y="Catch", x="Year")+
     #   ggplot2::geom_point(color="black",size=2)+ggplot2::theme_classic()+
     #   ggplot2::scale_y_continuous(limits=c(0,NA)) 
   })#, height = 200
-  
   
   observeEvent(input$button_1,{
     if(input$button_1 > 0) {
@@ -2432,7 +2361,6 @@ output$Stock_infobox_3=renderUI({
   ))
 })
   
-  
    # output$Stock_infobox_patience=shinydashboard::renderValueBox({
    #  shinydashboard::valueBox(shiny::h4( ),shiny::h4("Press 'Connect' to establish connection to FishBase or SeaLifeBase to get information on Lmax and Linf for your stock"),
    #                           color = "green") })
@@ -2448,10 +2376,6 @@ output$Stock_infobox_3=renderUI({
    #  shinydashboard::valueBox(shiny::h4( ),shiny::h4(HTML(paste0("Stock: ", tags$b(Stock_obj$LBB_ID$Stock),",  ","  ", "     Species: ", tags$b(tags$em(Stock_obj$LBB_ID$Species)))
    #                                                       )),
    #                           color = "light-blue") })
-  
-  
-
-  
  
   Final_stock=eventReactive(input$procc_rpriors,{
     final_stock=list(LBB_ID=Stock_obj$LBB_ID[Stock_obj$LBB_ID$Stock_objID==max(Stock_obj$LBB_ID$Stock_objID),],
@@ -2481,7 +2405,6 @@ output$Stock_infobox_3=renderUI({
                         ))
   })
   
-  
   output$someinfomk=renderUI({
     shiny::h5(tagList("Set the ratio between natural mortality rate (M) relative to somatic growth rate (M/K). A value of about 1.5 is typical for adults of species that grow throughout their life, reaching maximum size at maximum age." 
                              ))
@@ -2510,7 +2433,6 @@ output$Stock_infobox_3=renderUI({
             color = "green")
         }
   })
-  
   
   Fishbase_Table1=eventReactive(input$procc_rpriors,{
     req(Final_stock())
@@ -2544,7 +2466,6 @@ output$Stock_infobox_3=renderUI({
   Fishbase_maturity=eventReactive(input$procc_rpriors,{
     req(Final_stock())
     req(Fishbase_text())
-    
     results= fbsb_table_mat(Fishbase_text()[1])
     return(results)
   })
@@ -2554,10 +2475,6 @@ output$Stock_infobox_3=renderUI({
     DT::datatable(Fishbase_maturity(),
                   selection = 'single',rownames=FALSE, options = list(lengthMenu = c(5, 10, 20), pageLength = 5))
   })
-  
-  
-  
-  
   
   output$success_priors=shinydashboard::renderValueBox({
    if(isTruthy(input$Linf.user)) {
@@ -2571,11 +2488,8 @@ output$Stock_infobox_3=renderUI({
    } else {
      shinydashboard::valueBox(
        shiny::h4("Info"),
-      
          shiny::h4(HTML(paste0("Set priors to continue."))),
        icon = shiny::icon("thumbs-up", lib = "glyphicon"),color = "light-blue")
-     
-     
      }
      })
  
@@ -2600,14 +2514,12 @@ output$Stock_infobox_3=renderUI({
   # output$test_orf=renderTable({LBB_data()})
 
   observe({
-    
-    req(LBB_data())
+     req(LBB_data())
     LBB_data_=LBB_data()
     LBB_data_=LBB_data_[LBB_data_$Year %in% input$Sel_yrs,]
     max_LC=unique(max(LBB_data_$Length[LBB_data_$CatchNo>0],na.rm=T))
     max_LC=max_LC-1
     updateSliderInput(session,"L.cut",max=max_LC)
-    
   })
 
   # output$Year_Selection=renderUI({
@@ -2648,7 +2560,6 @@ output$Stock_infobox_3=renderUI({
     )
 })
   
-  
  observe({
      req(LBB_data())
    req(input$LFDs_per_page)
@@ -2657,7 +2568,6 @@ output$Stock_infobox_3=renderUI({
    years=unique(LBB_data_$Year)
    pages=ceiling(length(years)/input$LFDs_per_page)
      updateAwesomeRadio(session,"LBB_pages",choices=paste0("page ",seq(1,pages,1)))
- 
  })
   
   pic_LBB_see=reactive({
@@ -2703,7 +2613,6 @@ output$Stock_infobox_3=renderUI({
      Total_data2=aggregate(CatchNo   ~Year , data = LBB_data_, sum)
     # LBB_data_=LBB_data_%>%left_join(g.b_)
      LBB_data_=base::merge(x = LBB_data_, y = g.b_, all.x = TRUE)
-     
      LBB_data_=LBB_data_[order(LBB_data_$Year),]
         pics=list()
         LBB_data_t=  LBB_data_
@@ -2711,79 +2620,65 @@ output$Stock_infobox_3=renderUI({
         max_LBB_data=max(LBB_data_t$Length,na.rm=T)
         lengthss=seq(min_LBB_data,max_LBB_data,wdth)
         yearss=unique(LBB_data_t$Year)
-        
         LBB_data_show=expand.grid(Year=yearss,Length=lengthss)
       LBB_data_show=base::merge(x = LBB_data_show, y = LBB_data_t, all.x = TRUE)
        # LBB_data_show=left_join(LBB_data_show,LBB_data_t)
            LBB_data_show$CatchNo[is.na(LBB_data_show$CatchNo)]=0
         
     if(input$Change_view==FALSE) { 
-if(input$Scale_switch==FALSE) {
-
-    pics[[1]]=ggplot(data=LBB_data_show[LBB_data_show$Year %in% years_[[1]],], aes(x=Length, y=as.factor(Year), height = CatchNo, group = as.factor(Year)),fill="#F8766D") + 
-      geom_density_ridges(stat = "identity", scale = 1,alpha=0.7)+ggplot2::theme_classic()+ggplot2::labs(y="Year", x="LC")
-    
-    for (i in 1:pages) {
-      pics[[i]]= ggplot(data=LBB_data_show[LBB_data_show$Year %in% years_[[i]],], aes(x=Length, y=CatchNo))+
-        geom_rect(data=LBB_data_[LBB_data_$Year %in% years_[[i]],],aes(xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, fill=g.b), alpha=0.1, show.legend = FALSE) +
-        geom_line(col="#F8766D")+
-        geom_area(fill="#F8766D") +
-        # geom_point(shape=21,fill="#F8766D")+
-        scale_fill_manual(values = c("A"="white","B"="#F8766D"))+
-        geom_vline(aes(xintercept = input$L.cut,),size=1)+
-        geom_text(aes(y =max_catch/4, x = input$L.cut, label = paste0("L.cut")),col="red")+  #  position=position_nudge(y= .5)
-        geom_rect(aes(xmin=input$Linf.user-input$Linf_CV*input$Linf.user, 
-                      xmax=input$Linf.user+input$Linf_CV*input$Linf.user, ymin=-Inf, ymax=Inf, ),fill="lightgray", color="lightgray", alpha=0.05) +
-         geom_vline(aes(xintercept = input$Linf.user),col="gray",size=1)+
-        geom_text(aes(y =max_catch/4, x = input$Linf.user, label = paste0("Linf")),col="black")+  
-        geom_text(data = Total_data2[Total_data2$Year %in% years_[[i]],],
-                  aes(y =Inf, x = Inf,hjust=c(1),vjust=c(1),label = paste0("N=",round(CatchNo))),col="black")+
-        #position=position_nudge(y= .5)
-        labs(fill="",x="Length (cm)")+
-        facet_wrap(~Year, ncol=1)+theme_bw()#, scales="free_y"
       
+      if(input$Scale_switch==FALSE) {
+        pics[[1]]=ggplot(data=LBB_data_[LBB_data_$Year %in% years_[[1]],], aes(x=Length, y=CatchNo))+
+          geom_line()+
+          geom_point(shape=21,fill="#F8766D")+
+          facet_wrap(~Year, ncol=2)+theme_bw()#, scales="free_y"
+        for (i in 1:pages) {
+          pics[[i]]= ggplot(data=LBB_data_[LBB_data_$Year %in% years_[[i]],], aes(x=Length, y=CatchNo))+
+            geom_rect(data=LBB_data_[LBB_data_$Year %in% years_[[i]],],aes(xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, fill=g.b), alpha=0.1, show.legend = FALSE) +
+            geom_line()+
+            geom_point(shape=21,fill="#F8766D")+
+            scale_fill_manual(values = c("A"="white","B"="#F8766D"))+
+            geom_vline(aes(xintercept = input$L.cut,),size=1)+
+            geom_text(aes(y =max_catch/4, x = input$L.cut, label = paste0("L.cut")),col="red")+#      position=position_nudge(y= .5)
+            geom_rect(aes(xmin=input$Linf.user-input$Linf_CV*input$Linf.user, 
+                          xmax=input$Linf.user+input$Linf_CV*input$Linf.user, ymin=-Inf, ymax=Inf, ),fill="lightgray", color="lightgray", alpha=0.05) +
+            geom_vline(aes(xintercept = input$Linf.user),col="gray",size=1)+
+            geom_text(aes(y =max_catch/4, x = input$Linf.user, label = paste0("Linf")),col="black")+
+            geom_text(data = Total_data2[Total_data2$Year %in% years_[[i]],],
+                      aes(y =Inf, x = Inf,hjust=c(1),vjust=c(1),label = paste0("N=",round(CatchNo))),col="black")+
+            labs(x="Length (cm)")+
+            facet_wrap(~Year, ncol=1)+theme_bw()#, scales="free_y"
         }
-    
-} else if(input$Scale_switch==TRUE) {
-  
-  pics[[1]]=ggplot(data=LBB_data_show[LBB_data_show$Year %in% years_[[1]],], aes(x=Length, y=as.factor(Year), height = CatchNo_scaled, group = as.factor(Year))) + 
-    geom_density_ridges(stat = "identity", scale = 1,fill="#F8766D",alpha=0.7)+
-    ggplot2::theme_classic()+
-    ggplot2::labs(y="Year", x="Length class (cm)",fill="")
-
-  for (i in 1:pages) {
-    pics[[i]]=ggplot(data=LBB_data_show[LBB_data_show$Year %in% years_[[i]],], aes(x=Length, y=CatchNo))+
-      geom_rect(data=LBB_data_[LBB_data_$Year %in% years_[[i]],],aes(xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, fill=g.b), alpha=0.1, show.legend = FALSE) +
-      geom_line(col="#F8766D")+
-      #geom_point(shape=21,fill="#F8766D")+
-      geom_area(fill="#F8766D") +
-      geom_vline(aes(xintercept = input$L.cut,),size=1)+
-      scale_fill_manual(values = c("A"="white","B"="#F8766D"))+
-      geom_text(aes(y =max_catch/4, x = input$L.cut, label = paste0("L.cut")),col="red")+ # position=position_nudge(y= .9)
-      geom_rect(aes(xmin=input$Linf.user-input$Linf_CV*input$Linf.user, 
-                    xmax=input$Linf.user+input$Linf_CV*input$Linf.user, ymin=-Inf, ymax=Inf, ),fill="lightgray", color="lightgray", alpha=0.05) +
-      geom_vline(aes(xintercept = input$Linf.user),col="gray",size=1)+
-      geom_text(aes(y =max_catch/4, x = input$Linf.user, label = paste0("Linf")),col="black")+
-      geom_text(data = Total_data2[Total_data2$Year %in% years_[[i]],],
-                aes(y =Inf, x = Inf,hjust=c(1),vjust=c(1),label = paste0("N=",round(CatchNo))),col="black")+
-      #position=position_nudge(y= .9)
-      labs(fill="",x="Length (cm)")+
-      facet_wrap(~Year, scales="free_y", ncol=1)+theme_bw()
-
-  }
-  
-}} else {
+      } else if(input$Scale_switch==TRUE) {
+        pics[[1]]=ggplot(data=LBB_data_[LBB_data_$Year %in% years_[[1]],], aes(x=Length, y=CatchNo))+
+          geom_line()+
+          geom_point(shape=21,fill="#F8766D")+
+          facet_wrap(~Year, scales="free_y", ncol=2)+theme_bw()
+        for (i in 1:pages) {
+          pics[[i]]=ggplot(data=LBB_data_[LBB_data_$Year %in% years_[[i]],], aes(x=Length, y=CatchNo))+
+            geom_rect(data=LBB_data_[LBB_data_$Year %in% years_[[i]],],aes(xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, fill=g.b), alpha=0.1, show.legend = FALSE) +
+            geom_line()+
+            geom_point(shape=21,fill="#F8766D")+
+            geom_vline(aes(xintercept = input$L.cut,),size=1)+
+            scale_fill_manual(values = c("A"="white","B"="#F8766D"))+
+            geom_text(aes(y =max_catch/4, x = input$L.cut, label = paste0("L.cut")),col="red")+ #   position=position_nudge(y= .9)
+            geom_rect(aes(xmin=input$Linf.user-input$Linf_CV*input$Linf.user, 
+                          xmax=input$Linf.user+input$Linf_CV*input$Linf.user, ymin=-Inf, ymax=Inf, ),fill="lightgray", color="lightgray", alpha=0.05) +
+            geom_vline(aes(xintercept = input$Linf.user),col="gray",size=1)+
+            geom_text(aes(y =max_catch/4, x = input$Linf.user, label = paste0("Linf")),col="black")+
+            geom_text(data = Total_data2[Total_data2$Year %in% years_[[i]],],
+                      aes(y =Inf, x = Inf,hjust=c(1),vjust=c(1),label = paste0("N=",round(CatchNo))),col="black")+
+            labs(x="Length (cm)")+
+            facet_wrap(~Year, scales="free_y", ncol=1)+theme_bw()
+        }}
+      } else {
   
   if(input$Scale_switch==FALSE) {
-    
-    pics[[1]]=ggplot(data=LBB_data_[LBB_data_$Year %in% years_[[1]],], aes(x=Length, y=CatchNo))+
+     pics[[1]]=ggplot(data=LBB_data_[LBB_data_$Year %in% years_[[1]],], aes(x=Length, y=CatchNo))+
       geom_line()+
       geom_point(shape=21,fill="#F8766D")+
       facet_wrap(~Year, ncol=2)+theme_bw()#, scales="free_y"
-   
-
     for (i in 1:pages) {
-
         pics[[i]]= ggplot(data=LBB_data_[LBB_data_$Year %in% years_[[i]],], aes(x=Length, y=CatchNo))+
                   geom_rect(data=LBB_data_[LBB_data_$Year %in% years_[[i]],],aes(xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, fill=g.b), alpha=0.1, show.legend = FALSE) +
           geom_line()+
@@ -2800,9 +2695,7 @@ if(input$Scale_switch==FALSE) {
           labs(x="Length (cm)")+
         facet_wrap(~Year, ncol=2)+theme_bw()#, scales="free_y"
          }
-    
   } else if(input$Scale_switch==TRUE) {
-    
     pics[[1]]=ggplot(data=LBB_data_[LBB_data_$Year %in% years_[[1]],], aes(x=Length, y=CatchNo))+
       geom_line()+
       geom_point(shape=21,fill="#F8766D")+
@@ -2812,7 +2705,6 @@ if(input$Scale_switch==FALSE) {
         geom_rect(data=LBB_data_[LBB_data_$Year %in% years_[[i]],],aes(xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, fill=g.b), alpha=0.1, show.legend = FALSE) +
         geom_line()+
         geom_point(shape=21,fill="#F8766D")+
-
         geom_vline(aes(xintercept = input$L.cut,),size=1)+
         scale_fill_manual(values = c("A"="white","B"="#F8766D"))+
         geom_text(aes(y =max_catch/4, x = input$L.cut, label = paste0("L.cut")),col="red")+ #   position=position_nudge(y= .9)
@@ -2831,24 +2723,21 @@ if(input$Scale_switch==FALSE) {
       p_1=p_1+geom_vline(aes(xintercept = input$Lm50.user),col="black",size=1)+
         geom_text(aes(y =max_catch/4, x = input$Lm50.user, label = paste0("Lm")),col="blue")
     }
-    
     p_2=pics
     p_all=list(p_1,p_2)
   })
 
   output$Check_LBB_plot= shiny::renderPlot({
-    print(pic_LBB_see()[[1]])
+    req(pic_LBB_see())
+       print(pic_LBB_see()[[1]])
   })#, height = 340
 
-  
   output$success_LBB=shinydashboard::renderValueBox({
       shinydashboard::valueBox(
         shiny::h4("Info"),
         shiny::h4(HTML(paste0("If you are happy with the LBB fits, proceed to 5. Run the Yield/Recruit model."))),
         icon = shiny::icon("thumbs-up", lib = "glyphicon"),color = "light-blue")
   })
-  
-  
   
   observe({
     req(LBB_data())
@@ -2858,30 +2747,24 @@ if(input$Scale_switch==FALSE) {
     years=unique(LBB_data_$Year)
     pages=ceiling(length(years)/input$LFDs_per_page)
     updateAwesomeRadio(session,"LBB_pages_merg",choices=paste0("page ",seq(1,pages,1)))
-    
   })
 
   pic_MergeLF_plot=reactive({
     validate(
-      need(isTruthy(input$Sel_yrs), 'Processing...')
-    )
+      need(isTruthy(input$Sel_yrs), 'Processing...'))
     req(Final_stock())
     req(LBB_data())
     req(input$Sel_yrs)
     LBB_data_=LBB_data()
     g.b_=data.frame(Year=as.integer(sort(unique(LBB_data_$Year))),g.b=rep("A",length(unique(LBB_data_$Year))))
     g.b_$g.b[g.b_$Year %!in% input$Sel_yrs]="B"
-    
     if (input$Change_width==1) {
       LBB_data_=LBB_data_
     } else if (input$Change_width>1) {
-      
       if(Final_stock()[["LBB_ID"]]$Cr_sel=="created" ) {
         wdth=input$length_width} else {
           wdth=as.numeric(Final_stock()[["LBB_ID"]]$Lc.user)/10
         }
-      
-      
       wdth=wdth*input$Change_width
       max_LC=unique(max(LBB_data_$Length[LBB_data_$CatchNo>0],na.rm=T))
       classes=seq(0,max_LC,wdth)
@@ -2896,7 +2779,6 @@ if(input$Scale_switch==FALSE) {
     pages=ceiling(length(years)/input$LFDs_per_page)    
     years_=split(years, ceiling(seq_along(years)/input$LFDs_per_page))
     LBB_data_$CatchNo[LBB_data_$Length<=input$L.cut]=0
-    
     i = 0 # start counter
     sss2=list()
     for(Year in years) {
@@ -2916,22 +2798,16 @@ if(input$Scale_switch==FALSE) {
       LF.y$Year=Year
       LF.y=LF.y[,c("Year","Length","Freq" )]
       sss2[[i]]=LF.y
-      
     }
     LBB_data_=rbindlist(sss2)
     LBB_data_$max_catch=ave(LBB_data_$Freq,LBB_data_$Year,FUN = max)
     #LBB_data_=LBB_data_%>%left_join(g.b_)
     LBB_data_=base::merge(x = LBB_data_, y = g.b_, all.x = TRUE)
-    
     LBB_data_=LBB_data_[order(LBB_data_$Year),]
-    
     pics=list()
-    
     if(input$Change_view==FALSE) { 
-      
       pics[[1]]=ggplot(data=LBB_data_[LBB_data_$Year %in% years_[[1]],], aes(x=Length, y=as.factor(Year), height = Freq, group = as.factor(Year)),fill="#F8766D") + 
         geom_density_ridges(stat = "identity", scale = 1,alpha=0.7)+ggplot2::theme_classic()+ggplot2::labs(y="Year", x="LC")
-      
       for (i in 1:pages) {
         pics[[i]]= ggplot(data=LBB_data_[LBB_data_$Year %in% years_[[i]],], aes(x=Length, y=Freq))+
           geom_rect(data=LBB_data_[LBB_data_$Year %in% years_[[i]],],aes(xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, fill=g.b), alpha=0.1) +
@@ -2948,15 +2824,12 @@ if(input$Scale_switch==FALSE) {
           labs(fill="",x="Length (cm)")+
           facet_wrap(~Year, scales="free_y", ncol=1)+theme_bw()
       }
-      
     } else {
       pics[[1]]=ggplot(data=LBB_data_[LBB_data_$Year %in% years_[[1]],], aes(x=Length, y=Freq))+
         geom_line()+
         geom_point(shape=21,fill="#F8766D")+
         facet_wrap(~Year, ncol=2)+theme_bw()#, scales="free_y"
-
       for (i in 1:pages) {
-        
         pics[[i]]= ggplot(data=LBB_data_[LBB_data_$Year %in% years_[[i]],], aes(x=Length, y=Freq))+
           geom_rect(data=LBB_data_[LBB_data_$Year %in% years_[[i]],],aes(xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, fill=g.b), alpha=0.1) +
           geom_line()+
@@ -2981,7 +2854,6 @@ if(input$Scale_switch==FALSE) {
     print(pic_MergeLF_plot()[[1]])
   })#, height = 340
   
-  
   output$When_happy=shinydashboard::renderValueBox({
     shinydashboard::valueBox( shiny::h4("You can now proceed to'Run the model' tab"),shiny::h5(" "),
                               icon = shiny::icon("envelope"),color = "light-blue")})
@@ -3000,7 +2872,6 @@ if(input$Scale_switch==FALSE) {
     req(Final_stock())
     LBB_data_=LBB_data()
     LBB_data_=LBB_data_[LBB_data_$CatchNo>0,]
-    
     if(Final_stock()[["LBB_ID"]]$Cr_sel=="created" ) {
       wdth=input$length_width
  } else {    # munit=input$unit_col
@@ -3008,7 +2879,6 @@ if(input$Scale_switch==FALSE) {
        # munit="mm"              
      }
  AG_=LBB.AG(LBB_data_,input$Sel_yrs,wdth,input$Change_width,input$L.cut) #,munit
-      
  return(AG_)
   }) 
   
@@ -3061,12 +2931,9 @@ if(input$Scale_switch==FALSE) {
     LBB_AG$Length[which.max(LBB_AG$Freq)]
     var   <- wtd.var(LBB_AG$Length,LBB_AG$Freq)
     std   <- sqrt(var)
-    
-    
     updateSliderInput(session,"LmeanCV.user",value=std,min=round(0.5*std,1), max=round(2*std,1),step=0.1)
     #  }
   })
-  
   
   Run_nls=reactive({
     req(Run_AG())
@@ -3074,9 +2941,7 @@ if(input$Scale_switch==FALSE) {
     return(sss)
   }) 
   
-  
   run_pictures <- reactiveValues()
-  
 
  pic_AG_see=reactive({
    req(Run_AG())
@@ -3092,7 +2957,8 @@ if(input$Scale_switch==FALSE) {
    x=df1[,1]
    y=Lstart.Freq*exp(ZK.nls*(log(1-x/input$Linf.user)-log(1-x[1]/input$Linf.user)))
      SS=data.frame(x=x,y=y)
-   
+
+     
      
      if(input$GausSel==F) {
    pic_AG=ggplot(data=LF_ALL, aes(x=Length, y=Freq))+
@@ -3110,7 +2976,7 @@ if(input$Scale_switch==FALSE) {
      geom_vline(aes(xintercept =input$Linf.user),color="#619CFF",size=1)+
    geom_text(aes(y = 0.2, x = input$Linf.user, label = paste0("Linf")),size=6,col="#619CFF")
    
-   if (input$Linf.user-input$Lstart.user<5) {
+   if (length(LF_ALL$Length[LF_ALL$Length>input$Lstart.user & LF_ALL$Length<input$Linf.user])<5) {
      pic_AG=ggplot(data=LF_ALL, aes(x=Length, y=Freq))+
        geom_rect(mapping=aes(xmin=input$Lstart.user, xmax=input$Linf.user,
                                           ymin=0, ymax=Inf ),fill="red", color="red", alpha=0.2)+# geom_line()+
@@ -3156,20 +3022,17 @@ new_gaus_add=new_gaus[new_gaus$L>=1.05*input$Lmean.user,]
 
    }
    return(pic_AG)
-   
  }) 
  
    output$Check_AG_LBB_plot= shiny::renderPlot({
      print(pic_AG_see())
    })
-
    
    output$Selectivity_plots= shiny::renderPlot({
      l=seq(0,180,0.1)
      k=54
      s1=0.06
      s2=0.10
-     
      nm=vector()
      for (i in 1:length(l)) {
        nm[i]=exp((-(l[i]-k)^2)/2*s1^2)
@@ -3179,7 +3042,6 @@ new_gaus_add=new_gaus[new_gaus$L>=1.05*input$Lmean.user,]
        nm2[i]=exp((-(l[i]-k)^2)/2*s2^2)
      }
      
-     
      n_df=data.frame(L=l/180,nm=nm)
      n_df2=n_df[n_df$L<=n_df$L[n_df$nm==max(n_df$nm)],]
      n_df3=n_df[n_df$L>n_df$L[n_df$nm==max(n_df$nm)],]
@@ -3188,13 +3050,10 @@ new_gaus_add=new_gaus[new_gaus$L>=1.05*input$Lmean.user,]
      n_dfb2=n_dfb[n_dfb$L<=n_dfb$L[n_dfb$nm==max(n_dfb$nm)],]
      n_dfb3=n_dfb[n_dfb$L>n_dfb$L[n_dfb$nm==max(n_dfb$nm)],]
      
-     
-     
      p1=ggplot()+geom_vline(xintercept=n_df$L[n_df$nm==max(n_df$nm)],col= "#F8766D",linetype="dashed")+
        geom_line(data=n_df2,aes(x=L,y=nm),linetype="solid",size=1.5,col="black")+
        geom_line(data=n_dfb3,aes(x=L,y=nm),linetype="solid",size=1.5,col="black")+
        geom_line(data=n_df2,aes(x=L,y=nm),linetype="dashed",size=1.5,col="#619CFF")+
-       
        geom_line(data=n_df3,aes(x=L,y=nm),linetype="dashed",size=1.5,col="#619CFF")+
        geom_line(data=n_df3,aes(x=L,y=nm),linetype="solid",size=1.5,col="#619CFF",alpha=0.1)+theme_bw()+
        labs(x="Relative length (L/Linf)",y="Relative Frequency", title = "Gillnet-like selection")+
@@ -3307,7 +3166,6 @@ new_gaus_add=new_gaus[new_gaus$L>=1.05*input$Lmean.user,]
     LBB.object <- LBB_object()
     dir.create( paste0(dir.name(),"/LBB"))
     dir=paste0(paste0(dir.name(),"/LBB"))
-
     save(LBB.object,file =paste0(dir,"/", object_NAME(), ".RData"))
     Save_done <- showNotification(paste("Message:",  "The stock object with the input parameterization has been saved in ", paste0(dir.name(),"/LBB/",object_NAME(), ".RData")), duration = 5)
 
@@ -3335,7 +3193,6 @@ new_gaus_add=new_gaus[new_gaus$L>=1.05*input$Lmean.user,]
   output$created_objects <- renderUI({
     renderTable({as.data.frame( objects()[!is.na( objects()$A.A),])})
   })
-
   
   output$select_diff_obj <- renderUI({
     filenames <- list.files(paste0(dir.name(),"/LBB"), pattern="*.RData", full.names=F)
@@ -3480,8 +3337,8 @@ new_gaus_add=new_gaus[new_gaus$L>=1.05*input$Lmean.user,]
          # geom_text(aes(y = 0,x = r.Lopt, label = paste0("Lopt")), nudge_y=0.03,col="darkgreen")+
           geom_text(data=LBB_outcomes_[LBB_outcomes_$Year %in% years_[[i]],], 
                     aes(y =max_r.Freq.y/2,x =.1, label = paste0("Linf=",format(Linf,digits=3))), nudge_y=0.01,col="black")+
-          # geom_text(data=LBB_outcomes_[LBB_outcomes_$Year %in% years_[[i]],], 
-          #           aes(y =max_r.Freq.y/4,x =.1, label = paste0("Z/K=",format(MK+FK,digits=3))), nudge_y=0.01,col="black")+
+           geom_text(data=LBB_outcomes_[LBB_outcomes_$Year %in% years_[[i]],], 
+                     aes(y =max_r.Freq.y/4,x =.1, label = paste0("Z/K=",format(MK+FK,digits=3))), nudge_y=0.01,col="black")+
           scale_x_continuous(limits = c(0,1),breaks = seq(0,1,0.25))+
           scale_fill_manual(values = c("YES"="white","NO"="#F8766D"),labels=c("",""))+
           labs(x="Length/Linf",y="Relative frequency",fill="")+#
