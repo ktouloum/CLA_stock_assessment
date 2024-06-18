@@ -42,8 +42,8 @@ library(randtests) # REPLACEMENT of snpar
 library(shinycssloaders)
 
 #library(randtests) # REPLACEMENT of snpar
-# setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-# path=getwd()
+ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+path=getwd()
 
   linebreaks <- function(n){HTML(strrep(br(), n))}
   load("aux_data.RData")
@@ -3385,7 +3385,7 @@ library(shinycssloaders)
 
 
     ABC_object_=eventReactive(input$Save_priors,{
-    #req(Final_stock())
+    req(Final_stock())
       req(Catch_obj())
       req(bio_obj())
 
@@ -3441,6 +3441,11 @@ library(shinycssloaders)
       ABC_object=list(input=list(Stock_info=input_info,Input_parameters=input_param,Input_data=fstck_Catch_Data),
                       output=list(output_posteriors=output_posteriors_,output_timeseries=output_timeseries_))
 
+      if (isTruthy(input$con_fbase)) {
+        FT=Fishbase_text()} else {
+          FT=rep(NA,6)
+        }
+
       ########Stock_info
       ABC_object[["input"]][["Stock_info"]]$Stock=Final_stock()[["Catch_ID"]]$Stock
       ABC_object[["input"]][["Stock_info"]]$ScientificName =Final_stock()[["Catch_ID"]]$ScientificName
@@ -3468,16 +3473,16 @@ library(shinycssloaders)
       ABC_object[["input"]][["Input_parameters"]]$Resilience=input$resilience_in
       ABC_object[["input"]][["Input_parameters"]]$r.low=as.numeric(final_rpriors()[1])
       ABC_object[["input"]][["Input_parameters"]]$r.hi=as.numeric(final_rpriors()[2])
-
-      FBSLB_info_r=gsub(",","-",Fishbase_text()[1])
+      
+      FBSLB_info_r=gsub(",","-",FT[1])
       FBSLB_info_r=gsub(";",".",FBSLB_info_r)
-
-      FBSLB_info_Resilience=gsub(",","-",Fishbase_text()[2])
+      
+      FBSLB_info_Resilience=gsub(",","-",FT[2])
       FBSLB_info_Resilience=gsub(";",".",FBSLB_info_Resilience)
-
+      
       ABC_object[["input"]][["Input_parameters"]]$FBSLB_info_r=FBSLB_info_r
       ABC_object[["input"]][["Input_parameters"]]$FBSLB_info_Resilience=FBSLB_info_Resilience
-      ABC_object[["input"]][["Input_parameters"]]$FBSLB_page=Fishbase_text()[6]
+      ABC_object[["input"]][["Input_parameters"]]$FBSLB_page=FT[6]
       ABC_object[["input"]][["Input_parameters"]]$q_low=NA
       ABC_object[["input"]][["Input_parameters"]]$q_high=NA
 
@@ -3582,7 +3587,7 @@ library(shinycssloaders)
 
 
     observeEvent(input$Save_priors, {
-      req(object_NAME())
+     req(object_NAME())
       ABC_object <- ABC_object_()
       dir.create( paste0(dir.name(),"/CMSY"))
       dir=paste0(paste0(dir.name(),"/CMSY"))
