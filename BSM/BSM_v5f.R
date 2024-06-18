@@ -4017,11 +4017,8 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
       ABC_object=list(input=list(Stock_info=input_info,Input_parameters=input_param,Input_data=fstck_Catch_Data),
                       output=list(output_posteriors=output_posteriors_,output_timeseries=output_timeseries_))
       
-      
-      
       if (isTruthy(input$con_fbase)) {
         FT=Fishbase_text()} else {
-          
           FT=rep(NA,6)
         }
       
