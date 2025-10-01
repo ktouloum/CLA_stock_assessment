@@ -796,6 +796,32 @@ ggrk.plot= function(ABC.obj,rk.obj,fit_obj,METHOD) {
   
 }
 
+ggrk_2.plot= function(ABC.obj,rk.obj,fit_obj,METHOD) {
+  
+  if (METHOD=="CMSY") {
+    clr="blue"} else if (METHOD=="BSM") {
+      clr="red"
+    }
+  
+  my_y_title <-bquote(atop(Analysis~of~viable~"r-k"~pairs~"for"~bold(.(ABC.obj[["input"]][["Stock_info"]]$Stock))))
+  
+  pick_rk<-ggplot2::ggplot() +
+    ggplot2::geom_point(data=rk.obj[["rkplots"]],ggplot2::aes(x=ri1,y=ki1),color="grey",size=0.7,alpha=0.4)+
+    ggplot2::scale_x_continuous(trans='log',limits=c( as.numeric( ABC.obj[["input"]][["Input_parameters"]]$r.low),as.numeric( ABC.obj[["input"]][["Input_parameters"]]$r.hi)),labels = function(x) round(as.numeric(x),2)) +
+    ggplot2::scale_y_continuous(trans='log',limits=c(as.numeric(rk.obj[["rkpriors"]]$prior.k.low), as.numeric(rk.obj[["rkpriors"]]$prior.k.hi)),labels = function(x) round(as.numeric(x))) +
+    ggplot2::theme_classic()+
+    ggplot2::labs(y="k (tonnes)", x="r (1/year)",title=my_y_title)+
+    ggplot2::geom_point(data=data.frame(rs=fit_obj[["r"]],ks=fit_obj[["k"]]),ggplot2::aes(x=rs,y=ks),color="gray18",size=0.7,alpha=0.2)+
+    ggplot2::geom_point(data= ABC.obj[["output"]][["output_posteriors"]],ggplot2::aes(x=r_post[1],y=k_post[1]),color=clr,size=0.7)+
+    ggplot2::geom_segment(data= ABC.obj[["output"]][["output_posteriors"]],ggplot2::aes(x=ifelse(r_post[2]>0,r_post[2],0.001),y=k_post[1],xend=r_post[3],yend=k_post[1]),col=clr,size=0.7)+
+    ggplot2::geom_segment(data= ABC.obj[["output"]][["output_posteriors"]],ggplot2::aes(x=r_post[1],y=ifelse(k_post[2]>0,k_post[2],0.001),xend=r_post[1],yend=k_post[3]),col=clr,size=0.7)+
+    theme(text = element_text(size = 10)) 
+  
+  return(pick_rk)
+  
+}
+
+
 ggcatch.plot= function(ABC.obj,METHOD,Management=F) {
   if (METHOD=="CMSY") {
     clr="blue"} else if (METHOD=="BSM") {
@@ -1300,6 +1326,22 @@ gg_management.plot= function(ABC.obj,fit_obj,METHOD) {
                                 ncol = 2,nrow = 2)
   return(temp_object)
 }
+
+ 
+ 
+ gg_summary.plot= function(ABC.obj,rk.obj,fit_obj,METHOD) {
+   pic_1summary=ggcatch.plot(ABC.obj,METHOD,Management=F)
+   pic_2summary=ggrk.plot(ABC.obj,rk.obj,fit_obj,METHOD)+ggtitle("Finding viable r-k")
+   pic_3summary=ggrk_2.plot(ABC.obj,rk.obj,fit_obj,METHOD)+ggtitle("Analysis of viable r-k")
+   pic_4summary=ggbk.plot(ABC.obj,METHOD,Management=F)+ggtitle("Stock size")
+   pic_5summary=ggFFmsy.plot(ABC.obj,METHOD,Management=F)+ggtitle("Exploitation rate")
+   pic_6summary=ggparabola.plot(ABC.obj,METHOD)+ggtitle("Equilibrium curve")
+   temp_object=ggpubr::ggarrange(pic_1summary,pic_2summary,pic_3summary,pic_4summary,pic_5summary,pic_6summary,
+                                 labels=c("A","B","C","D","E","F"),
+                                 ncol = 3,nrow = 2)
+   return(temp_object)
+ }
+
 
 
 ggpdiagnostics.plot= function(ABC.obj,fit_obj,METHOD) {
@@ -2789,7 +2831,12 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
                                                                                                            min = 150, max = 900, value = 300,step=50,sep = ""),
                                                                                                shinyWidgets::downloadBttn("download_pic_A", "Save graph",
                                                                                                                           color = "primary",style = "unite",
-                                                                                                                          no_outline=F,block=F))#,
+                                                                                                                          no_outline=F,block=F)),
+                                                                              tags$hr(style = "border-top: 3px solid #000000;"),
+                                                                              shinyWidgets::actionBttn(inputId="button_summary",label =" Create assessment summary",
+                                                                                                       style = "unite",size = "md",icon = shiny::icon("paper-plane"),
+                                                                                                       no_outline=F,block=F,color="primary"),
+                                                                              
                                                                               ,width=12))),
                                   column(width = 8,align="center",
                                          shiny::fluidRow(
@@ -4562,7 +4609,19 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
       Save_done <- showNotification(paste("Message: ", "All the outcomes are saved in your working directory"), duration = 10)
       
     })
-        
+    
+    observeEvent(input$button_summary, {
+      if (input$Id049=="A") {
+        nm=object_NAME()} else if (input$Id049=="B") {
+          nm=input$Id081}
+      device_="png"
+      
+      xxx= gg_summary.plot(ABC_object_final(),r.k_priors(),BSM_run(),"BSM")
+      
+      ggsave(filename=paste0(paste0(dir.name(),"/BSM/outputs/",nm,"/","Summary_pic."),device_),plot=xxx, device =device_, width = 25, height =18, units = "cm",  dpi = 300)
+      Save_done <- showNotification(paste("Message: ", "Summary outcomes are saved in your working directory"), duration = 5)
+    })
+    
     observeEvent(input$Retrospective, {
       req( run_pictures$pic_J)
       if (input$Id049=="A") {
@@ -4867,7 +4926,6 @@ ABC.forward=function(ABC_fit,ABC_res,nyears=5,status.quo_years=1,interim.quant =
     
     output$catch_forecast= shiny::renderPlot({
       req(ABC_FW())
-      
       to_sim=ABC_FW()
       interim_year=to_sim$year[to_sim$Scenario=="fit"]
       interim_year=max(as.integer(interim_year))+1
