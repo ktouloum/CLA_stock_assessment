@@ -1343,6 +1343,8 @@ gg_management.plot= function(ABC.obj,fit_obj,METHOD) {
    return(temp_object)
  }
 
+ 
+ 
 
 
 ggpdiagnostics.plot= function(ABC.obj,fit_obj,METHOD) {
