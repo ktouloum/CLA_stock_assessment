@@ -1004,37 +1004,36 @@ ggFFmsy.plot= function(ABC.obj,METHOD,Management=F) {
   return(pic_FFmsy)
 }
 
-ggparabola.plot= function(ABC.obj,METHOD) {
+ggparabola.plot= function(CLA.obj,METHOD) {
   if (METHOD=="CMSY") {
     clr="blue"} else if (METHOD=="BSM") {
       clr="red"
     }
-  my_y_title <-bquote(atop(Equilibrium~curve~"for"~bold(.(ABC.obj[["input"]][["Stock_info"]]$Stock))))
-  temp_data=as.data.frame(ABC.obj[["output"]][["output_timeseries"]])
+  my_y_title <-bquote(atop(Equilibrium~curve~"for"~bold(.(CLA.obj[["input"]][["Stock_info"]]$Stock))))
+  temp_data=as.data.frame(CLA.obj[["output"]][["output_timeseries"]])
   temp_data$yr=as.integer(row.names(temp_data))
   nyr=length(temp_data$yr)
   x=seq(from=0,to=2,by=0.001)
   y.c  <- ifelse(x>0.25,1,ifelse(x>0.125,4*x,exp(-10*(0.125-x))*4*x)) # correction for low recruitment below half and below quarter of Bmsy
   y=(4*x-(2*x)^2)*y.c
   temp_parabola=data.frame(x=x,y=y)
-  max.parabola2=max(c(1.5,1.2*(ct.cmsy=as.numeric(ABC.obj[["output"]][["output_timeseries"]][["Catch"]])/
-                                 as.numeric(ABC.obj[["output"]][["output_posteriors"]][["MSY_post"]][1]))),na.rm=T)
+  max.parabola2=max(c(1.5,1.2*(ct.cmsy=as.numeric(CLA.obj[["output"]][["output_timeseries"]][["Catch"]])/
+                                 as.numeric(CLA.obj[["output"]][["output_posteriors"]][["MSY_post"]][1]))),na.rm=T)
   
-  MSY.cmsy=as.numeric(ABC.obj[["output"]][["output_posteriors"]][["MSY_post"]][1])
+  MSY.cmsy=as.numeric(CLA.obj[["output"]][["output_posteriors"]][["MSY_post"]][1])
   
   pic_parabola=ggplot2::ggplot()+
     ggplot2::geom_line(data=temp_parabola,ggplot2::aes(x=x,y=y),size=0.7)+
     ggplot2::scale_y_continuous(limits=c(0,max.parabola2)) +
     ggplot2::scale_x_continuous(limits=c(0,1)) +
-    ggplot2::geom_path(data=temp_data,ggplot2::aes(x=bk,y=Catch/MSY.cmsy,color=clr), size=0.7)+
-    
+    ggplot2::geom_segment(data=temp_data,ggplot2::aes(x=bk,xend =lead(bk),y=Catch/MSY.cmsy,yend=lead(Catch/MSY.cmsy),color=clr), size=0.7,arrow=arrow(type="closed", length = unit(0.1, "inches")))+
     ggplot2::geom_point(data=temp_data,ggplot2::aes(x=bk[1],y=Catch[1]/MSY.cmsy,shape="0"),color=clr, size=2)+
     ggplot2::geom_point(data=temp_data,ggplot2::aes(x=bk[nyr],y=Catch[nyr]/MSY.cmsy,shape="2"),color=clr, size=2)+
     ggplot2::scale_color_manual(labels="Catch/MSY",values=c(clr))+
-    ggplot2::scale_shape_manual(name="",labels=c("start year", "end year"),values=c(0,2))+ ggplot2::theme(
-      legend.position = "bottom")+
-    ggplot2::labs(y="Catch / MSY", x="Relative biomass B/k",color="",title=my_y_title)+ ggplot2::theme_classic()+ggplot2::theme(
-      legend.position = "bottom")+
+    ggplot2::scale_shape_manual(name="",labels=c("start year", "end year"),values=c(0,2))+
+    ggplot2::theme(legend.position = "bottom")+
+    ggplot2::labs(y="Catch / MSY", x="Relative biomass B/k",color="",title=my_y_title)+
+    ggplot2::theme_classic()+ggplot2::theme(legend.position = "bottom")+
     theme(text = element_text(size = 10)) 
   
   return(pic_parabola)
