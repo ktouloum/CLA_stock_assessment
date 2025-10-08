@@ -808,19 +808,20 @@ ggrk_2.plot= function(ABC.obj,rk.obj,fit_obj,METHOD) {
   
   pick_rk<-ggplot2::ggplot() +
     ggplot2::geom_point(data=rk.obj[["rkplots"]],ggplot2::aes(x=ri1,y=ki1),color="grey",size=0.7,alpha=0.4)+
-    ggplot2::scale_x_continuous(trans='log',limits=c( as.numeric( ABC.obj[["input"]][["Input_parameters"]]$r.low),as.numeric( ABC.obj[["input"]][["Input_parameters"]]$r.hi)),labels = function(x) round(as.numeric(x),2)) +
+    ggplot2::scale_x_continuous(trans='log',limits=c( 0.9*as.numeric( ABC.obj[["output"]][["output_posteriors"]]$r_post[2]),as.numeric( 1.1*ABC.obj[["output"]][["output_posteriors"]]$r_post[3])),labels = function(x) round(as.numeric(x),2)) +
     ggplot2::scale_y_continuous(trans='log',limits=c(as.numeric(rk.obj[["rkpriors"]]$prior.k.low), as.numeric(rk.obj[["rkpriors"]]$prior.k.hi)),labels = function(x) round(as.numeric(x))) +
     ggplot2::theme_classic()+
     ggplot2::labs(y="k (tonnes)", x="r (1/year)",title=my_y_title)+
     ggplot2::geom_point(data=data.frame(rs=fit_obj[["r"]],ks=fit_obj[["k"]]),ggplot2::aes(x=rs,y=ks),color="gray18",size=0.7,alpha=0.2)+
     ggplot2::geom_point(data= ABC.obj[["output"]][["output_posteriors"]],ggplot2::aes(x=r_post[1],y=k_post[1]),color=clr,size=0.7)+
-    ggplot2::geom_segment(data= ABC.obj[["output"]][["output_posteriors"]],ggplot2::aes(x=ifelse(r_post[2]>0,r_post[2],0.001),y=k_post[1],xend=r_post[3],yend=k_post[1]),col=clr,size=0.7)+
+    ggplot2::geom_segment(data= ABC.obj[["output"]][["output_posteriors"]],ggplot2::aes(x=ifelse(r_post[2]>0,r_post[2], as.numeric( ABC.obj[["input"]][["Input_parameters"]]$r.low)),y=k_post[1],xend=r_post[3],yend=k_post[1]),col=clr,size=0.7)+
     ggplot2::geom_segment(data= ABC.obj[["output"]][["output_posteriors"]],ggplot2::aes(x=r_post[1],y=ifelse(k_post[2]>0,k_post[2],0.001),xend=r_post[1],yend=k_post[3]),col=clr,size=0.7)+
     theme(text = element_text(size = 10)) 
   
   return(pick_rk)
   
 }
+
 
 
 ggcatch.plot= function(ABC.obj,METHOD,Management=F) {
