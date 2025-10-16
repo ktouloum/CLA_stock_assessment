@@ -40,6 +40,8 @@ library(fs)
 library(data.table)
 library(randtests) # REPLACEMENT of snpar
 library(shinycssloaders)
+library(gplots)
+library(dplyr)
 
 #library(randtests) # REPLACEMENT of snpar
  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
