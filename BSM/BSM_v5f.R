@@ -1331,10 +1331,14 @@ gg_management.plot= function(ABC.obj,fit_obj,METHOD) {
  
  
  gg_summary.plot= function(ABC.obj,rk.obj,fit_obj,METHOD) {
-   pic_1summary=ggcatch.plot(ABC.obj,METHOD,Management=F)
+   pic_1summary=ggcatch.plot(ABC.obj,METHOD,Management=F)+geom_point(data=ABC.obj[["input"]][["Input_data"]],
+                                                                     ggplot2::aes(x=yr,y=ct),shape=21,fill="gray")
    pic_2summary=ggrk.plot(ABC.obj,rk.obj,fit_obj,METHOD)+ggtitle("Finding viable r-k")
    pic_3summary=ggrk_2.plot(ABC.obj,rk.obj,fit_obj,METHOD)+ggtitle("Analysis of viable r-k")
-   pic_4summary=ggbk.plot(ABC.obj,METHOD,Management=F)+ggtitle("Stock size")
+   pic_4summary=ggbk.plot(ABC.obj,METHOD,Management=F)+ggtitle("Stock size")+geom_point(data=ABC.obj[["input"]][["Input_data"]],
+                                                                                        ggplot2::aes(x=yr,y=ABC.obj[["input"]][["Input_data"]][["bt"]]/
+                                                                                                       (ABC.obj[["output"]][["output_posteriors"]][["q_post"]][1]*
+                                                                                                          ABC.obj[["output"]][["output_posteriors"]][["k_post"]][1])),shape=21,fill="gray")
    pic_5summary=ggFFmsy.plot(ABC.obj,METHOD,Management=F)+ggtitle("Exploitation rate")
    pic_6summary=ggparabola.plot(ABC.obj,METHOD)+ggtitle("Equilibrium curve")
    temp_object=ggpubr::ggarrange(pic_1summary,pic_2summary,pic_3summary,pic_4summary,pic_5summary,pic_6summary,
@@ -1342,9 +1346,6 @@ gg_management.plot= function(ABC.obj,fit_obj,METHOD) {
                                  ncol = 3,nrow = 2)
    return(temp_object)
  }
-
- 
- 
 
 
 ggpdiagnostics.plot= function(ABC.obj,fit_obj,METHOD) {

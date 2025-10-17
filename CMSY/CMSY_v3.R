@@ -1155,7 +1155,8 @@ path=getwd()
   
   
   gg_summary.plot= function(ABC.obj,rk.obj,fit_obj,METHOD) {
-    pic_1summary=ggcatch.plot(ABC.obj,METHOD,Management=F)
+    pic_1summary=ggcatch.plot(ABC.obj,METHOD,Management=F)+geom_point(data=ABC.obj[["input"]][["Input_data"]],
+                                                                      ggplot2::aes(x=yr,y=ct),shape=21,fill="gray")
     pic_2summary=ggrk.plot(ABC.obj,rk.obj,fit_obj,METHOD)+ggtitle("Finding viable r-k")
     pic_3summary=ggrk_2.plot(ABC.obj,rk.obj,fit_obj,METHOD)+ggtitle("Analysis of viable r-k")
     pic_4summary=ggbk.plot(ABC.obj,METHOD,Management=F)+ggtitle("Stock size")
@@ -1166,7 +1167,6 @@ path=getwd()
                                   ncol = 3,nrow = 2)
     return(temp_object)
   }
-  
   
 
   ggprorposterior.plot= function(ABC.obj,fit_obj,rk.obj,METHOD) {
