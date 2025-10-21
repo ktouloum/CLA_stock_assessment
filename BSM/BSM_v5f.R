@@ -673,6 +673,25 @@ ABC_fit= function(ABC.obj,rk.obj,q.obj,METHOD) {
             length(as.integer(ABC.obj[["input"]][["Input_parameters"]]$StartYear):
                      as.integer(ABC.obj[["input"]][["Input_parameters"]]$EndYear)))
   
+  
+  if (is.na(as.numeric(ABC.obj[["input"]][["Input_parameters"]]$intb.low))) {
+    intb.low=0.4 } else {
+      intb.low=as.numeric(ABC.obj[["input"]][["Input_parameters"]]$intb.low)
+    }
+  if (is.na(as.numeric(ABC.obj[["input"]][["Input_parameters"]]$intb.hi))) {
+    intb.hi=0.5 } else {
+      intb.hi=as.numeric(ABC.obj[["input"]][["Input_parameters"]]$intb.hi)
+    }
+  
+  if (is.na(as.numeric(ABC.obj[["input"]][["Input_parameters"]]$endb.low))) {
+    endb.low=0.4 } else {
+      endb.low=as.numeric(ABC.obj[["input"]][["Input_parameters"]]$endb.low)
+    }
+  if (is.na(as.numeric(ABC.obj[["input"]][["Input_parameters"]]$endb.hi))) {
+    endb.hi=0.5 } else {
+      endb.hi=as.numeric(ABC.obj[["input"]][["Input_parameters"]]$endb.hi)
+    }
+  
   b.prior_ = rbind(matrix(c(as.numeric(ABC.obj[["input"]][["Input_parameters"]]$stb.low),as.numeric(ABC.obj[["input"]][["Input_parameters"]]$stb.hi),
                             as.numeric(ABC.obj[["input"]][["Input_parameters"]]$intb.low),as.numeric(ABC.obj[["input"]][["Input_parameters"]]$intb.hi),
                             as.numeric(ABC.obj[["input"]][["Input_parameters"]]$endb.low),as.numeric(ABC.obj[["input"]][["Input_parameters"]]$endb.hi)),2,3),rep(0,3)) # last row includes the 0 penalty
