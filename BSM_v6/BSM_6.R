@@ -47,8 +47,8 @@ library(datamods)
 #library(plotly)
 library(purrr)
 
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-path=getwd()
+# setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+# path=getwd()
 '%!in%' <- function(x,y)!('%in%'(x,y))
 linebreaks <- function(n){HTML(strrep(br(), n))}
 
@@ -953,7 +953,6 @@ shinyUI <- shinydashboard::dashboardPage(#skin = "purple",
                                          conditionalPanel(condition = "input.Start_run",
                                                           shinydashboard::box(collapsible = F,
                                                                               shinycssloaders::withSpinner(shiny::plotOutput("Parabola")),
-                                                                            #  shiny::h5("Surplus production equilibrium parabola, with reduced productivity at small stock sizes. Overlaid are the corresponding modeled results for relative catch and stock size (red)."),
                                                                               shiny::h5(tagList("Surplus production equilibrium parabola, with reduced productivity at small stock sizes. Overlaid are the corresponding modeled results for relative catch and stock size (red).", actionLink(inputId = "open_helpTablerk", label = "(More Guidance)"))),
                                                                               width = 12))),
                                        shiny::fluidRow(
@@ -1251,7 +1250,7 @@ shinyServer=function(input, output, session){
   })
   
   
-  output$lastButtonCliked=renderText({input$last_btn})
+  #output$lastButtonCliked=renderText({input$last_btn})
   
   # observeEvent(input$Upld_butt_1,{   #TRICK to erase things
   #   # shinyWidgets::updateMaterialSwitch(session, "Upld_butt_2", value = F)
@@ -1622,7 +1621,10 @@ shinyServer=function(input, output, session){
     end.yr=Final_stock()$input$Input_data[c("yr","bt")]$yr[max(which(Final_stock()$input$Input_data[c("yr","bt")]$bt>0))]
     selestart=ifelse(is.na(Final_stock()[["input"]][["Input_parameters"]][["StartYear_bt"]]),AAA,Final_stock()[["input"]][["Input_parameters"]][["StartYear_bt"]])
     seleend=ifelse(is.na(Final_stock()[["input"]][["Input_parameters"]][["EndYear_bt"]]),end.yr,Final_stock()[["input"]][["Input_parameters"]][["EndYear_bt"]])
-     updateSliderInput(session, "bio_yr_slct", value = c(selestart,seleend) ,min = AAA, max =end.yr)
+   if (seleend>input$yr_slct[2]){
+     seleend=input$yr_slct[2]
+   }
+      updateSliderInput(session, "bio_yr_slct", value = c(selestart,seleend) ,min = AAA, max =end.yr)
   })
   
   observe({
@@ -2178,7 +2180,7 @@ shinyServer=function(input, output, session){
       dir=paste0(paste0(dir.name(),"/BSM_wd"))
       
       saveRDS(CLA_obj,file =paste0(dir,"/", object_NAME(), "_A.rds"))
-      Save_done <- showNotification(paste("Message:",  "The stock object with the input parameterization has been saved in ", paste0(dir.name(),"/BSM/",object_NAME(), ".rds")), duration = 10)
+      Save_done <- showNotification(paste("Message:",  "The stock object with the input parameterization has been saved in ", paste0(dir.name(),"/BSM_wd/",object_NAME(), ".rds")), duration = 10)
       
     })
     

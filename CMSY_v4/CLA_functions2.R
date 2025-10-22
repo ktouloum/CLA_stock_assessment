@@ -46,9 +46,6 @@ mvn   <- function(n,mean.log.r,sd.log.r,mean.log.k,sd.log.k) {
 }
 
 get_beta <- function(mu,CV,Min=0,Prior="x"){
-  if (mu==1) {
-    mu=0.99
-  }
   a = seq(0.0001,1000,0.001)
   b= (a-mu*a)/mu
   s2 = a*b/((a+b)^2*(a+b+1))
@@ -622,6 +619,9 @@ q.priors=function(Biomass_object,rk_object) {
   return(c(q.prior,q.init))
 } 
 
+
+
+
 Catch_obj=function(inp,start_yr=NA, end_yr=NA,smoother_bw=1,Catch_CV=0.15,Plot=T,ShowCV=T ) {
   minyr=min(inp$yr[!is.na(inp$ct)])
   maxyr=max(inp$yr[!is.na(inp$ct)])
@@ -909,17 +909,25 @@ Biom_priors=function(Catch.obj,nbk=3,start_bio,int_bio,int_bio_year,end_bio, Plo
 }
 
 
+
+
 ggbkpriors.plot=function(Catch.obj,bk_priors) {
+  
   #my_y_title <-bquote(atop(Compare~expert~and~ANN~priors~"for"~the~stock~bold(.(Final_stock()[["Catch_ID"]][1,"Stock"]))~of~italic(.(Final_stock()[["Catch_ID"]][1,"ScientificName"]))))
+  
+  
   nbk=bk_priors$params$nbk
   Cbj=Catch.obj$ct_data
   int_year_man=bk_priors$MAN_Priors$int[3]
   int_year_ANN=bk_priors$ANN_priors$int[3]
   
   ANNpriors=bk_priors$ANN_priors
+  
+  
   temp_ANN=data.frame(yr=c(min(Cbj$yr),int_year_ANN,max(Cbj$yr)),ln=c(mean(bk_priors$ANN_priors$start[1:2]),
                                                                       mean(bk_priors$ANN_priors$int[1:2]),
                                                                       mean(bk_priors$ANN_priors$end[1:2])))
+  
   p_1= ggplot2::ggplot(data=Cbj,ggplot2::aes(x=yr)) +
     ggplot2::theme_classic()+
     ggplot2::scale_x_continuous(limits = c(min(Cbj$yr,na.rm=T)-1,max(Cbj$yr,na.rm=T)+1))+
