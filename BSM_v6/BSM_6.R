@@ -1602,9 +1602,9 @@ shinyServer=function(input, output, session){
   observe({   #TRICK to erase things
     req(Final_stock())
     mnyr=min(Final_stock()$input$Input_data$yr,na.rm = T)
-    mxyr= max(Final_stock()$input$Input_data$yr,na.rm = T)
+    mxyr= max(Final_stock()$input$Input_data$yr[!is.na(Final_stock()$input$Input_data$ct)],na.rm = T)
    starty=ifelse(is.na(Final_stock()$input$Input_parameters$StartYear),mnyr,Final_stock()$input$Input_parameters$StartYear)
-   endy=ifelse(is.na(Final_stock()$input$Input_parameters$EndYear),mxyr,Final_stock()$input$Input_parameters$EndYear)
+   endy=ifelse(is.na(Final_stock()$input$Input_parameters$EndYear) ,mxyr,Final_stock()$input$Input_parameters$EndYear)
     updateSliderInput(session, "yr_slct", value = c(starty,endy),min = mnyr, max =mxyr)
   })
 
@@ -1613,18 +1613,19 @@ shinyServer=function(input, output, session){
     req(Final_stock())
     req(input$yr_slct)
     mnyr=input$yr_slct[1]
+    maxnyr=input$yr_slct[2]
     start.yr.bio  =Final_stock()$input$Input_data[c("yr","bt")]$yr[which(Final_stock()$input$Input_data[c("yr","bt")]$bt>0)[1]]
     if (mnyr>=start.yr.bio) {
       AAA=mnyr} else {
         AAA=start.yr.bio
       }
-    end.yr=Final_stock()$input$Input_data[c("yr","bt")]$yr[max(which(Final_stock()$input$Input_data[c("yr","bt")]$bt>0))]
+    end.yr=Final_stock()$input$Input_data[c("yr","bt")]$yr[max(which(Final_stock()$input$Input_data[c("yr","bt")]$bt>0 & !is.na(Final_stock()$input$Input_data[c("yr","bt")]$bt)))]
     selestart=ifelse(is.na(Final_stock()[["input"]][["Input_parameters"]][["StartYear_bt"]]),AAA,Final_stock()[["input"]][["Input_parameters"]][["StartYear_bt"]])
     seleend=ifelse(is.na(Final_stock()[["input"]][["Input_parameters"]][["EndYear_bt"]]),end.yr,Final_stock()[["input"]][["Input_parameters"]][["EndYear_bt"]])
-   if (seleend>input$yr_slct[2]){
-     seleend=input$yr_slct[2]
+   if (seleend>=maxnyr){
+     seleend=maxnyr
    }
-      updateSliderInput(session, "bio_yr_slct", value = c(selestart,seleend) ,min = AAA, max =end.yr)
+      updateSliderInput(session, "bio_yr_slct", value = c(selestart,seleend) ,min = AAA, max =maxnyr)
   })
   
   observe({

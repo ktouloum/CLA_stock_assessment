@@ -695,6 +695,8 @@ Bio_obj=function(inp,start_yr=NA, end_yr=NA,smoother_bw=1,ecreep=F,ecreep_yr=NA,
     maxyr=end_yr
   }
   temp_bio_obj=inp[inp$yr>=minyr & inp$yr<=maxyr,]
+  temp_bio_obj=temp_bio_obj[!is.na(temp_bio_obj$yr),]
+  temp_bio_obj=temp_bio_obj[!is.na(temp_bio_obj$ct),]
   temp_bio_obj$bt_iterp=imputeTS::na_interpolation(temp_bio_obj$bt, option="linear") #"spline" , "stine"
   temp_bio_obj$bt_smthd=ksmooth(x=temp_bio_obj$yr,y=temp_bio_obj$bt_iterp,kernel="normal",n.points=length(temp_bio_obj$yr),bandwidth=smoother_bw)$y ####set bdwd
   temp_bio_obj$ecreep=NA
