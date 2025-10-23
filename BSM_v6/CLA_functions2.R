@@ -2838,6 +2838,7 @@ CLA.summary =function(CLA.obj) {
 }
 
 
+
 ggkiel.plot= function(CLA.obj,METHOD) {
   if (METHOD=="CMSY") {
     clr="blue"} else if (METHOD=="BSM") {
@@ -2861,6 +2862,8 @@ ggkiel.plot= function(CLA.obj,METHOD) {
   
   temp_data$FMSY_Catch[ temp_data$FMSY_Catch>CLA.obj[["output"]][["output_posteriors"]]$MSY_post[1]]=CLA.obj[["output"]][["output_posteriors"]]$MSY_post[1]
   
+  temp_data$B_high[temp_data$B_high>1.05*max(temp_data$B)]=1.05*max(temp_data$B)
+
   my_y_title <-bquote(atop(Biomass~and~Catch~plot~"for"~bold(.(CLA.obj[["input"]][["Stock_info"]]$Stock))))
   
   pic_biocatch=ggplot2::ggplot()+
@@ -2884,7 +2887,8 @@ ggkiel.plot= function(CLA.obj,METHOD) {
     ggplot2::theme(
       legend.position = "bottom")+
     ggplot2::labs(x="Year",y="Catch",title=my_y_title,fill="",color="",linetype="")+
-    ggplot2::scale_y_continuous(limits=c(0,NA)) +
+    ggplot2::scale_y_continuous(limits=c(0,1.05*max(temp_data$B)),expand = expansion(mult = c(0,0.0))) +
+    ggplot2::scale_x_continuous(expand = expansion(mult = c(0,0.03))) +
     theme(text = element_text(size = 10)) 
   return(pic_biocatch)
 }
