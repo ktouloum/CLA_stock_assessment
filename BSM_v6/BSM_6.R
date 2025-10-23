@@ -46,6 +46,7 @@ library(dplyr)
 library(datamods)
 #library(plotly)
 library(purrr)
+library(rmarkdown)
 
 # setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 # path=getwd()
@@ -62,7 +63,8 @@ nn_file<- "ffnn.bin" # file containing neural networks trained to estimate B/k p
 species_DB=readRDS("species_DB.rds")
 TEST_DATA=readRDS("TEST_DATA.rds")
 
-only_catch=c("Aust_pec_Namaqua","Belo_bel_TunisianPGSidra","Boop_boo_AzoresCanariesMadeira", "Boop_boo_GulfGuineaIs",        
+
+only_catch=c("Acadian_redfish_Gulf_of_Maine_Georges_Bank","Aust_pec_Namaqua","Belo_bel_TunisianPGSidra","Boop_boo_AzoresCanariesMadeira", "Boop_boo_GulfGuineaIs",        
              "Bore_sai_Kara","Brac_aur_GulfGuineaW","Brev_pec_RioGrande","Bros_bro_NGrandBanks")
 TEST_DATA=TEST_DATA[names(TEST_DATA) %!in% only_catch]
 Stock_names=names(TEST_DATA)
@@ -920,6 +922,8 @@ shinyUI <- shinydashboard::dashboardPage(#skin = "purple",
                                                                             shinyWidgets::actionBttn(inputId="button_summary",label =" Create assessment summary",
                                                                                                      style = "unite",size = "md",icon = shiny::icon("paper-plane"),
                                                                                                      no_outline=F,block=F,color="primary"),
+                                                                            tags$hr(style = "border-top: 3px solid #000000;"),
+                                                                            downloadButton("report", "Generate report"),
                                                                             width=12))),
                                 column(width = 8,align="center",
                                        shiny::fluidRow(
@@ -934,13 +938,13 @@ shinyUI <- shinydashboard::dashboardPage(#skin = "purple",
                                          conditionalPanel(condition = "input.Start_run",
                                                           shinydashboard::box(collapsible = F,
                                                                               shinycssloaders::withSpinner(shiny::plotOutput("Catch_plot_final")),
-                                                                              shiny::h5("The plot shows as blue curve the catch and as dashed horizontal line the estimate of MSY, both with indication of 95% CI. The dots indicate the catch data provided to the model."),
+                                                                              shiny::h5("The plot shows as black curve the catch and as dashed horizontal line the estimate of MSY, both with indication of 95% CI. The dots indicate the catch data provided to the model."),
                                                                               width = 12))),
                                        shiny::fluidRow(
                                          conditionalPanel(condition = "input.Start_run",
                                                           shinydashboard::box(collapsible = F,
                                                                               shinycssloaders::withSpinner(shiny::plotOutput("Pred_biom_plot")),
-                                                                              shiny::h5("Plot of estimated biomass (red), with dotted lines indicating the 2.5th and 97.5th percentiles. Vertical purple lines indicate the prior biomass ranges and the grey dots indicate the scaled CPUE. The dashed horizontal line indicates Bmsy and the dotted line indicates Blim."),
+                                                                              shiny::h5("Plot of estimated biomass (blue), with dotted lines indicating the 2.5th and 97.5th percentiles. Vertical purple lines indicate the prior biomass ranges and the grey dots indicate the scaled CPUE. The dashed horizontal line indicates Bmsy and the dotted line indicates Blim."),
                                                                               width = 12))),#,height = 320
                                        shiny::fluidRow(
                                          conditionalPanel(condition = "input.Start_run",
@@ -955,13 +959,19 @@ shinyUI <- shinydashboard::dashboardPage(#skin = "purple",
                                                                               shinycssloaders::withSpinner(shiny::plotOutput("Parabola")),
                                                                               shiny::h5(tagList("Surplus production equilibrium parabola, with reduced productivity at small stock sizes. Overlaid are the corresponding modeled results for relative catch and stock size (red).", actionLink(inputId = "open_helpTablerk", label = "(More Guidance)"))),
                                                                               width = 12))),
+                                        shiny::fluidRow(
+                                                conditionalPanel(condition = "input.Start_run",
+                                                                 shinydashboard::box(collapsible = F,
+                                                                                     shinycssloaders::withSpinner(shiny::plotOutput("kiel_plot")),
+                                                                                     shiny::h5("Kiel-plot of biomass (blue), catch (black) and maximum sustainable Fmsy-catch given the biomass (green), for easy comparison. The dotted lines indicate the absolute maximum sustainable catch (MSY) and the minimum biomass that can produce MSY. Note that Fmsy is reduced linearly if biomass falls below Bmsy and becomes zero below half of Bmsy."),
+                                                                                     width = 12))), 
                                        shiny::fluidRow(
                                          column(width = 12,align="center",offset=1,
                                                 conditionalPanel(condition = "input.Start_run",
                                                                  shinydashboard::box(collapsible = F,
                                                                                      shinycssloaders::withSpinner(shiny::plotOutput("kobe_plot")),
                                                                                      shiny::h5("The Kobe plot combines the time series of stock size (B/Bmsy on the X-axis) and exploitation (F/Fmsy on the Y-axis). The colors identify combinations of stock size and exploitation as: Green = sustainable; Yellow = overfished; Orange = subject to overfishing; Red = overfished and subject to overfishing. The black line shows the time series of stock status and exploitation, and the shaded areas give the plausible confidence intervals for the last year as detailed in the legend."),
-                                                                                     width = 10))))#)
+                                                                                     width = 10))))
                                 )
                               ), 
                               shinyBS::bsModal(id='popup_Page_helpTablerk',
@@ -2369,7 +2379,7 @@ shinyServer=function(input, output, session){
     
     ############ Catch plot
     observeEvent(input$Start_run,{
-      run_pictures$pic_B=ggcatch.plot(CLA_object_final(),METHOD = "BSM") 
+      run_pictures$pic_B=ggcatch.plot(CLA_object_final(),METHOD = "BSM")
       pic_B_ready <- showNotification(paste("Message: ", "Catch graph ready"), duration = 5)
     })
     
@@ -2418,6 +2428,24 @@ shinyServer=function(input, output, session){
       }
     })
     
+    
+    ##### Biocatch plot
+    ###### KOBE PLOT
+    observeEvent(input$Start_run,{
+      run_pictures$pic_M=ggkiel.plot(CLA_object_final(),"BSM") 
+      pic_M_ready <- showNotification(paste("Message: ", "Kiel-plot ready"), duration = 5)
+      
+    })
+    
+    output$kiel_plot= shiny::renderPlot({
+      run_pictures$pic_M
+    })
+    
+    
+    
+    
+    
+    
     ###### KOBE PLOT
     observeEvent(input$Start_run,{
       # withProgress(message = 'Making kobe plot', value = 0, {
@@ -2440,6 +2468,10 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
     output$kobe_plot= shiny::renderPlot({
       run_pictures$pic_F
     })
+    
+    
+    
+    
     
     observeEvent(input$Start_run,{
       run_pictures$pic_G= ggmanagement.plot(CLA_object_final(),BSM_run(),"BSM")
@@ -2524,7 +2556,7 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
     })
     
     
-    observeEvent(input$button_summary, {
+    observeEvent(input$Start_run, {
       # if (input$Id049=="A") {
       #   } else if (input$Id049=="B") {
       #     nm=input$Id081}
@@ -2711,7 +2743,35 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
     })
     
     
-    
+    output$report <- downloadHandler(
+      # For PDF output, change this to "report.pdf"
+      filename = "report.html",
+      content = function(file) {
+        # Copy the report file to a temporary directory before processing it, in
+        # case we don't have write permissions to the current working dir (which
+        # can happen when deployed).
+        tempReport <- file.path(tempdir(), "report.Rmd")
+        file.copy("report.Rmd", tempReport, overwrite = TRUE)
+        
+        # Set up parameters to pass to Rmd document
+        
+        
+        params <- list(obj = CLA_object_final(),
+                       pic=    run_pictures$pic_K,
+                       pic_F=    run_pictures$pic_F,
+                       pic_I= run_pictures$pic_I
+                       
+        )
+
+        # Knit the document, passing in the `params` list, and eval it in a
+        # child of the global environment (this isolates the code in the document
+        # from the code in this app).
+        rmarkdown::render(tempReport, output_file = file,
+                          params = params,
+                          envir = new.env(parent = globalenv())
+        )
+      }
+    )
     
     
   observe({
