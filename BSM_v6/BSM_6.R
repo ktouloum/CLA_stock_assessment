@@ -1130,7 +1130,7 @@ shinyUI <- shinydashboard::dashboardPage(#skin = "purple",
                               tags$hr(style = "border-top: 2px solid #000000;"),
                               #tags$hr(style = "border-top: 2px solid #000000;"),
                               #tableOutput("test_orf"), ######################
-                              shiny::fluidRow(shiny::h3(tags$b("ABC app team:"))),
+                              shiny::fluidRow(shiny::h3(tags$b("CLA app team:"))),
                               tags$hr(style = "border-top: 2px solid #000000;")
       )
     )
@@ -2429,8 +2429,7 @@ shinyServer=function(input, output, session){
     })
     
     
-    ##### Biocatch plot
-    ###### KOBE PLOT
+    ##### Kiel plot
     observeEvent(input$Start_run,{
       run_pictures$pic_M=ggkiel.plot(CLA_object_final(),"BSM") 
       pic_M_ready <- showNotification(paste("Message: ", "Kiel-plot ready"), duration = 5)
@@ -2440,10 +2439,6 @@ shinyServer=function(input, output, session){
     output$kiel_plot= shiny::renderPlot({
       run_pictures$pic_M
     })
-    
-    
-    
-    
     
     
     ###### KOBE PLOT
@@ -2468,9 +2463,6 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
     output$kobe_plot= shiny::renderPlot({
       run_pictures$pic_F
     })
-    
-    
-    
     
     
     observeEvent(input$Start_run,{
@@ -2555,11 +2547,7 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
       
     })
     
-    
     observeEvent(input$Start_run, {
-      # if (input$Id049=="A") {
-      #   } else if (input$Id049=="B") {
-      #     nm=input$Id081}
       device_="png"
       nm=object_NAME()
       #xxx= gg_summary.plot(CLA_object_final(),CLA_object_final()[["rk_object"]],BSM_run(),"BSM")
@@ -2569,15 +2557,11 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
       Save_done <- showNotification(paste("Message: ", "Summary outcomes are saved in your working directory"), duration = 5)
     })
     
-   
-    
+
     output$Summary_plot <- shiny::renderPlot({
       run_pictures$pic_K
     })
-    
-    
-    
-    
+
     observeEvent(input$Retrospective, {
       req( run_pictures$pic_J)
         nm=object_NAME()
@@ -2725,10 +2709,6 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
     })
     
     
-    
-        
-      
-    
     observe({
       req(CLA_FW())
         nm=object_NAME()
@@ -2759,7 +2739,7 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
         params <- list(obj = CLA_object_final(),
                        pic=    run_pictures$pic_K,
                        pic_F=    run_pictures$pic_F,
-                       pic_I= run_pictures$pic_I
+                       pic_I= run_pictures$pic_M
                        
         )
 

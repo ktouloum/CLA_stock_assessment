@@ -1076,28 +1076,6 @@ CLA.fit= function(CLA.obj,METHOD=c("CMSY","BSM")[2],n.chains=2) {
   
   q_prrs= c(CLA.obj$input$Input_parameters$q_low,CLA.obj$input$Input_parameters$q_high)
   init.q_=mean(q_prrs)
-  # if (METHOD == "CMSY") {
-  #   init.q_=1
-  #   q_prrs= c(0.99,1.01)
-  # }else if (METHOD == "BSM") { 
-  #   q_prrs=c(as.numeric(ABC.obj[["input"]][["Input_parameters"]]$q_low),as.numeric(ABC.obj[["input"]][["Input_parameters"]]$q_high))
-  #   if(mean(ABC.obj[["input"]][["Input_data"]]$bt_smthd,na.rm=T)<100) {
-  #     q_prrs <- q_prrs/1000
-  #     }
-  #   
-  #   init.q_=mean(c(as.numeric(ABC.obj[["input"]][["Input_parameters"]]$q_low),as.numeric(ABC.obj[["input"]][["Input_parameters"]]$q_high)),na.rm=T)
-  #   if(mean(ABC.obj[["input"]][["Input_data"]]$bt_smthd,na.rm=T)<100) {
-  #     init.q_ <- init.q_/1000
-  #     }
-  # }
-  
-  ####nbk
-  
-  # if (ABC.obj[["input"]][["Input_parameters"]]$nbk=="Only start")  {
-  #   nbk=1 } else if (ABC.obj[["input"]][["Input_parameters"]]$nbk=="Start & intermediate") {
-  #     nbk=2  } else {
-  #       nbk=3
-  #     }
   nbk= CLA.obj$input$Input_parameters$nbk
   
   pen.bk = pen.F = rep(0,length(CLA.obj[["input"]][["Input_data"]]$ct_smthd))
@@ -1127,7 +1105,6 @@ CLA.fit= function(CLA.obj,METHOD=c("CMSY","BSM")[2],n.chains=2) {
   b.prior_ = rbind(matrix(c(as.numeric(CLA.obj[["input"]][["Input_parameters"]]$stb.low),as.numeric(CLA.obj[["input"]][["Input_parameters"]]$stb.hi),
                             intb.low,intb.hi,
                             endb.low,endb.hi),2,3),rep(0,3)) # last row includes the 0 penalty
-  
   
   if (METHOD == "CMSY") { 
     bt.start <- mean(c(CLA.obj$rk_object[["rkpriors"]]$prior.k.low*
