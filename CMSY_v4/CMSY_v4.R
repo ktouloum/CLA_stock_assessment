@@ -47,9 +47,10 @@ library(dplyr)
 library(datamods)
 #library(plotly)
 library(purrr)
+library(rmarkdown)
 
-# setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-# path=getwd()
+ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+ path=getwd()
 '%!in%' <- function(x,y)!('%in%'(x,y))
 linebreaks <- function(n){HTML(strrep(br(), n))}
 
@@ -667,28 +668,6 @@ test_CATCH_ID= tibble::as_tibble(test_CATCH_ID[,c("Continent","Region","Subregio
         ############ ############ ############
         shinydashboard::tabItem(tabName = "run_model",
                                 shiny::fluidRow(uiOutput("Zavarakatranemia")),
-                                # shiny::fluidRow(
-                                #   conditionalPanel(condition = "input.Save_priors",
-                                #   shinydashboard::box(collapsible = F,align="center", background = "light-blue",
-                                #    column(width=4,align="center",
-                                #           awesomeRadio(
-                                #   inputId = "Id049",
-                                #   label = "Select 'A' to run the current stock object or select 'B' to choose one of the saved object versions. You can examine the content of the chosen object by pressing the 'See selected object' button",
-                                #   choices = c("A", "B"),
-                                #   selected = "A",
-                                #   inline = TRUE,
-                                #   checkbox = TRUE
-                                # )),
-                                # column(width=4,align="center",
-                                # conditionalPanel(condition = "input.Id049=='B'",
-                                #                  uiOutput("select_diff_obj"),
-                                #                  )),
-                                # column(width=4,align="center",
-                                #        conditionalPanel(condition = "input.Id049=='B'",
-                                #                            shinyWidgets::actionBttn(inputId="see_obj",label =" See selected object",
-                                #                                 style = "unite",size = "md",icon = shiny::icon("paper-plane"),
-                                #                                 no_outline=F,block=F,color="primary"))
-                                # ) , width=12))),
                                 shiny::fluidRow(
                                   column(width=4,align="center",
                                          uiOutput("cond_ifmany_run"),
@@ -830,8 +809,9 @@ test_CATCH_ID= tibble::as_tibble(test_CATCH_ID[,c("Continent","Region","Subregio
                                                                               shinyWidgets::actionBttn(inputId="button_summary",label =" Create assessment summary",
                                                                                                        style = "unite",size = "md",icon = shiny::icon("paper-plane"),
                                                                                                        no_outline=F,block=F,color="primary"),
-                                                                              
-                                                                              ,width=12))),
+                                                                              tags$hr(style = "border-top: 3px solid #000000;"),
+                                                                              downloadButton("report", "Generate report"),
+                                                                              width=12))),
                                   column(width = 8,align="center",
                                          shiny::fluidRow(
                                            # column(width = 6,
@@ -866,6 +846,12 @@ test_CATCH_ID= tibble::as_tibble(test_CATCH_ID[,c("Continent","Region","Subregio
                                                                                 shinycssloaders::withSpinner(shiny::plotOutput("Parabola")),
                                                                                 shiny::h5(tagList("Surplus production equilibrium parabola, with reduced productivity at small stock sizes. Overlaid are the corresponding modeled results for relative catch and stock size (red).", actionLink(inputId = "open_helpTablerk", label = "(More Guidance)"))),
                                                                                 width = 12))),
+                                         shiny::fluidRow(
+                                           conditionalPanel(condition = "input.Start_run",
+                                                            shinydashboard::box(collapsible = F,
+                                                                                shinycssloaders::withSpinner(shiny::plotOutput("kiel_plot")),
+                                                                                shiny::h5("Kiel-plot of biomass (blue), catch (black) and maximum sustainable Fmsy-catch given the biomass (green), for easy comparison. The dotted lines indicate the absolute maximum sustainable catch (MSY) and the minimum biomass that can produce MSY. Note that Fmsy is reduced linearly if biomass falls below Bmsy and becomes zero below half of Bmsy."),
+                                                                                width = 12))), 
                                          shiny::fluidRow(
                                            column(width = 12,align="center",offset=1,
                                                   conditionalPanel(condition = "input.Start_run",
@@ -1897,7 +1883,7 @@ test_CATCH_ID= tibble::as_tibble(test_CATCH_ID[,c("Continent","Region","Subregio
       return(claobj)
     })
     
-    output$TESTNEURAL=renderTable({Fishbase_text()})
+ # output$TESTNEURAL=renderTable({Fishbase_text()})
     
     
     middle_outplts=eventReactive(input$Save_priors==T,{
@@ -1986,8 +1972,8 @@ test_CATCH_ID= tibble::as_tibble(test_CATCH_ID[,c("Continent","Region","Subregio
        CLA_obj <- CLA_object()
        dir.create( paste0(dir.name(),"/CMSY_wd"))
        dir=paste0(paste0(dir.name(),"/CMSY_wd"))
-       
-       saveRDS(CLA_obj,file =paste0(dir,"/", object_NAME(), "_A.rds"))
+
+       saveRDS(CLA_obj,file =paste0(dir,"/","data_prep_CLA_object_", object_NAME(), "_A.rds"))
        Save_done <- showNotification(paste("Message:",  "The stock object with the input parameterization has been saved in ", paste0(dir.name(),"/CMSY_wd/",object_NAME(), ".rds")), duration = 10)
        
      })
@@ -2340,25 +2326,6 @@ test_CATCH_ID= tibble::as_tibble(test_CATCH_ID[,c("Continent","Region","Subregio
 
     
     
-    
-    
-    
-    
-    
-    observeEvent(input$button_summary, {
-      # if (input$Id049=="A") {
-      #   } else if (input$Id049=="B") {
-      #     nm=input$Id081}
-      device_="png"
-      nm=object_NAME()
-      run_pictures$pic_K= gg_summary.plot(CLA_object_final(),CMSY_run(),"CMSY")
-      
-      ggsave(filename=paste0(paste0(dir.name(),"/CMSY_wd/outputs/",nm,"/","Summary_pic."),device_),plot= run_pictures$pic_K, device =device_, width = 25, height =18, units = "cm",  dpi = 300)
-      Save_done <- showNotification(paste("Message: ", "Summary outcomes are saved in your working directory"), duration = 5)
-    })
-    
-    
-    
    
     CLA_retro=eventReactive(input$Retrospective,{
       req(CLA_object_final())
@@ -2375,7 +2342,7 @@ test_CATCH_ID= tibble::as_tibble(test_CATCH_ID[,c("Continent","Region","Subregio
     observeEvent(input$Retrospective, {
       req( run_pictures$pic_J)
       nm=object_NAME()
-      device_="tiff"
+      device_="png"
       ggsave(filename=paste0(paste0(dir.name(),"/CMSY_wd/outputs/",nm,"/","retrospective_pic."),device_),plot=run_pictures$pic_J, device =device_, width = 18, height =9, units = "cm",  dpi = 300)
       Save_done <- showNotification(paste("Message: ", "Retrospective outcomes are saved in your working directory"), duration = 5)
     })
@@ -2399,6 +2366,18 @@ test_CATCH_ID= tibble::as_tibble(test_CATCH_ID[,c("Continent","Region","Subregio
     output$Summary_plot <- shiny::renderPlot({
       run_pictures$pic_K
     })
+    
+    
+    ##### Kiel plot
+    observeEvent(input$Start_run,{
+      run_pictures$pic_M=ggkiel.plot(CLA_object_final(),"CMSY") 
+      pic_M_ready <- showNotification(paste("Message: ", "Kiel-plot ready"), duration = 5)
+    })
+    
+    output$kiel_plot= shiny::renderPlot({
+      run_pictures$pic_M
+    })
+    
     
     observe({
       req(CLA_object_final())
@@ -2433,7 +2412,7 @@ test_CATCH_ID= tibble::as_tibble(test_CATCH_ID[,c("Continent","Region","Subregio
       
       dir.create(paste0(dir.name(),"/CMSY_wd/outputs"))
       dir.create(paste0(dir.name(),"/CMSY_wd/outputs/",nm))
-      device_="tiff"
+      device_="png"
       
       ggsave(filename=paste0(paste0(dir.name(),"/CMSY_wd/outputs/",nm,"/","rk_pic."),device_),plot=run_pictures$pic_A, device =device_, width = 16, height =10, units = "cm",  dpi = 300)
       ggsave(filename=paste0(paste0(dir.name(),"/CMSY_wd/outputs/",nm,"/","Catch_and_MSY."),device_),plot=run_pictures$pic_B, device =device_, width = 16, height =10, units = "cm",  dpi = 300)
@@ -2443,30 +2422,26 @@ test_CATCH_ID= tibble::as_tibble(test_CATCH_ID[,c("Continent","Region","Subregio
       ggsave(filename=paste0(paste0(dir.name(),"/CMSY_wd/outputs/",nm,"/","Kobe_plot."),device_),plot=run_pictures$pic_F, device =device_, width = 16, height =10, units = "cm",  dpi = 300)
       ggsave(filename=paste0(paste0(dir.name(),"/CMSY_wd/outputs/",nm,"/","Management_graphs."),device_),plot=run_pictures$pic_G, device =device_, width = 16, height =10, units = "cm",  dpi = 300)
       ggsave(filename=paste0(paste0(dir.name(),"/CMSY_wd/outputs/",nm,"/","prior_posterior_distributions."),device_),plot=run_pictures$pic_H, device =device_, width = 16, height =10, units = "cm",  dpi = 300)
-      saveRDS(CLA_object,file =paste0(dir.name(),"/CMSY_wd/outputs/",nm,"/","CLA_obj_",gsub(" ", "_",CLA_object[["input"]][["Stock_info"]][["ScientificName"]]), "_",Sys.Date(), "_final.rds"))
+      saveRDS(CLA_object,file =paste0(dir.name(),"/CMSY_wd/outputs/",nm,"/","data_compl_CLA_object_",gsub(" ", "_",CLA_object[["input"]][["Stock_info"]][["ScientificName"]]), "_",Sys.Date(), "_final.rds"))
       write.csv(cbind(CLA_object[["input"]][["Stock_info"]],CLA_object[["input"]][["Input_parameters"]]), paste0(dir.name(),"/CMSY_wd/outputs/",nm,"/input_parameters.csv"), row.names = F)
       write.csv(CLA_object[["output"]][["output_timeseries"]], paste0(dir.name(),"/CMSY_wd/outputs/",nm,"/output_timeseries.csv"), row.names = TRUE)
       write.csv(CLA_object[["output"]][["output_posteriors"]], paste0(dir.name(),"/CMSY_wd/outputs/",nm,"/output_posteriors.csv"), row.names = TRUE)
       Save_done <- showNotification(paste("Message: ", "All the outcomes are saved in your working directory"), duration = 10)
       
     })
-    # observeEvent(input$Retrospective, {
-    #   req( run_pictures$pic_I)
-    #   if (input$Id049=="A") {
-    #     nm=object_NAME()} else if (input$Id049=="B") {
-    #       nm=input$Id081}
-    #   device_="tiff"
-    #   ggsave(filename=paste0(paste0(dir.name(),"/CMSY/outputs/",nm,"/","retrospective_pic."),device_),plot=run_pictures$pic_I, device =device_, width = 18, height =9, units = "cm",  dpi = 300)
-    #   Save_done <- showNotification(paste("Message: ", "Retrospective outcomes are saved in your working directory"), duration = 5)
-    # })
-
-    # observe({
-    #   req(ABC_object_final())
-    #   if (input$Id049=="A") {
-    #     nm=object_NAME()} else if (input$Id049=="B") {
-    #       nm=input$Id081}
-    #   output$working_directory=renderUI({ shiny::h4(tagList("All your outcomes are stored in the directory: ",  tags$b(paste0(dir.name(),"/CMSY/outputs/",nm))))})
-    # })
+    
+    
+    observeEvent(input$Start_run, {
+      device_="png"
+      nm=object_NAME()
+      run_pictures$pic_K= gg_summary.plot(CLA_object_final(),CMSY_run(),"CMSY")
+      
+      ggsave(filename=paste0(paste0(dir.name(),"/CMSY_wd/outputs/",nm,"/","Summary_pic."),device_),plot= run_pictures$pic_K, device =device_, width = 25, height =18, units = "cm",  dpi = 300)
+      Save_done <- showNotification(paste("Message: ", "Summary outcomes are saved in your working directory"), duration = 5)
+    })
+    
+    
+    
 
     output$download_pic_A <- downloadHandler(
       filename = function(){
@@ -2476,10 +2451,49 @@ test_CATCH_ID= tibble::as_tibble(test_CATCH_ID[,c("Continent","Region","Subregio
                         device =  input$format_picA, width =  input$width_pic_A, height = input$height_pic_A, units = "cm",  dpi = as.integer(input$dpi_pic_A))
       })
 
+    
+    
+    
+    output$report <- downloadHandler(
+      filename = "report.html",
+      content = function(file) {
+        # Copy the report file to a temporary directory before processing it, in
+        # case we don't have write permissions to the current working dir (which
+        # can happen when deployed).
+        tempReport <- file.path(tempdir(), "report.Rmd")
+        file.copy("report.Rmd", tempReport, overwrite = TRUE)
+        
+        # Set up parameters to pass to Rmd document
+        
+        
+        params <- list(obj = CLA_object_final(),
+                       pic=    run_pictures$pic_K,
+                       pic_F=    run_pictures$pic_F#,
+                     #  pic_I= run_pictures$pic_M
+        )
+        
+        # Knit the document, passing in the `params` list, and eval it in a
+        # child of the global environment (this isolates the code in the document
+        # from the code in this app).
+        rmarkdown::render(tempReport, output_file = file,
+                          params = params,
+                          envir = new.env(parent = globalenv())
+        )
+      }
+    )
+    
+    
+    
+    
     observe({
       if (input$quit == 1) stopApp()
     })
   }
+
+
+  
+    
+
 
   shinyApp(ui=shinyUI, server=shinyServer)
 

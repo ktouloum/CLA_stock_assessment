@@ -756,29 +756,6 @@ shinyUI <- shinydashboard::dashboardPage(#skin = "purple",
       ############ ############ ############
       shinydashboard::tabItem(tabName = "run_model",
                               shiny::fluidRow(uiOutput("Zavarakatranemia")),
-                              # shiny::fluidRow(
-                              #   conditionalPanel(condition = "input.Save_priors",
-                              #                    shinydashboard::box(collapsible = F,align="center", background = "light-blue",
-                              #                                        column(width=4,align="center",
-                              #                                               awesomeRadio(
-                              #                                                 inputId = "Id049",
-                              #                                                 label = "Select 'A' to run the current stock object or select 'B' to choose one of the saved object versions. You can examine the content of the chosen object by pressing the 'See selected object' button", 
-                              #                                                 choices = c("A", "B"),
-                              #                                                 selected = "A",
-                              #                                                 inline = TRUE, 
-                              #                                                 checkbox = TRUE
-                              #                                               )),
-                              #                                        column(width=4,align="center",
-                              #                                               
-                              #                                               conditionalPanel(condition = "input.Id049=='B'",
-                              #                                                                uiOutput("select_diff_obj"),
-                              #                                               )),
-                              #                                        column(width=4,align="center",
-                              #                                               conditionalPanel(condition = "input.Id049=='B'",
-                              #                                                                shinyWidgets::actionBttn(inputId="see_obj",label =" See selected object",
-                              #                                                                                         style = "unite",size = "md",icon = shiny::icon("paper-plane"),
-                              #                                                                                         no_outline=F,block=F,color="primary"))  
-                              #                                        ) , width=12))),
                               shiny::fluidRow(
                                 column(width=4,align="center",
                                        uiOutput("cond_ifmany_run"),
@@ -1016,7 +993,6 @@ shinyUI <- shinydashboard::dashboardPage(#skin = "purple",
                                                trigger="button_summary",
                                                size = "large",
                                                shinycssloaders::withSpinner(shiny::plotOutput('Summary_plot')))
-                              
                               ),
       
       ################################################################
@@ -1071,7 +1047,6 @@ shinyUI <- shinydashboard::dashboardPage(#skin = "purple",
                                                                             )
                                                                             ,width = 12)
                                                         )
-                                                        # )
                                                  ),
                                 column(width = 8,#offset=2,
                                        conditionalPanel(condition = "input.Start_run",
@@ -1115,7 +1090,6 @@ shinyUI <- shinydashboard::dashboardPage(#skin = "purple",
                                 )
                               )
       ),
-      
       shinydashboard::tabItem(tabName = "addit_info",
                               #tags$hr(style = "border-top: 2px solid #000000;"),
                               shiny::fluidRow(shiny::h3(tags$b("References:")),
@@ -1128,7 +1102,6 @@ shinyUI <- shinydashboard::dashboardPage(#skin = "purple",
                               shiny::fluidRow(shiny::h3(tags$b("Issue tracking:")),
                                               shiny::h4("touloumisk@inale.gr")),
                               tags$hr(style = "border-top: 2px solid #000000;"),
-                              #tags$hr(style = "border-top: 2px solid #000000;"),
                               #tableOutput("test_orf"), ######################
                               shiny::fluidRow(shiny::h3(tags$b("CLA app team:"))),
                               tags$hr(style = "border-top: 2px solid #000000;")
@@ -1259,38 +1232,6 @@ shinyServer=function(input, output, session){
     return(Creatd_Stck_obj)
   })
   
-  
-  #output$lastButtonCliked=renderText({input$last_btn})
-  
-  # observeEvent(input$Upld_butt_1,{   #TRICK to erase things
-  #   # shinyWidgets::updateMaterialSwitch(session, "Upld_butt_2", value = F)
-  #   shinyWidgets::updateMaterialSwitch(session, "Upld_butt_3", value =F)
-  # })
-  # 
-  
-  # observeEvent(input$button_1,{   #TRICK to erase things
-  #   shinyWidgets::updatePrettySwitch(session, "upMaterial4", value = F)
-  #   shinyWidgets::updatePrettySwitch(session, "ecreepyes", value = F)
-  #   shinyWidgets::updatePrettySwitch(session, "Smooth_bt_switch", value = F)
-  #   shinyWidgets::updatePrettySwitch(session, "upMaterial1", value = F)
-  #   shinyWidgets::updatePrettySwitch(session, "catch_cw_switch", value = F)
-  #   shinyWidgets::updatePrettySwitch(session, "Smooth_Catch_switch", value = F)
-  #   shinyWidgets::updateMaterialSwitch(session, "Acc_rpriors", value = F)
-  #   shinyWidgets::updateMaterialSwitch(session, "Priors_but2", value = F)
-  # })
-  # 
-  # 
-  # observeEvent(input$button_2,{   #TRICK to erase things
-  #   shinyWidgets::updatePrettySwitch(session, "upMaterial4", value = F)
-  #   shinyWidgets::updatePrettySwitch(session, "ecreepyes", value = F)
-  #   shinyWidgets::updatePrettySwitch(session, "Smooth_bt_switch", value = F)
-  #   shinyWidgets::updatePrettySwitch(session, "upMaterial1", value = F)
-  #   shinyWidgets::updatePrettySwitch(session, "catch_cw_switch", value = F)
-  #   shinyWidgets::updatePrettySwitch(session, "Smooth_Catch_switch", value = F)
-  #   shinyWidgets::updateMaterialSwitch(session, "Acc_rpriors", value = F)
-  #   shinyWidgets::updateMaterialSwitch(session, "Priors_but2", value = F)
-  # })
-  
   output$Stock_infobox_1=shinydashboard::renderValueBox({
     shinydashboard::valueBox(shiny::h4("Success!"),shiny::h5(HTML(paste0("You have created the stock object ", input$Crtd_StckID_input,br(),
                                                                          " of the species ",tags$em(input$Sp_Scient), ".",br(),
@@ -1419,7 +1360,6 @@ shinyServer=function(input, output, session){
           text = "Oups !", type = "error")
       } else {
         sel_stock_obj=TEST_DATA[[which(names(TEST_DATA)==input$txt1)]]
-        
          }
     }
     sel_stock_obj$input$Input_parameters$Ecreep_cpue[is.na(sel_stock_obj$input$Input_parameters$Ecreep_cpue)]=FALSE
@@ -1427,50 +1367,7 @@ shinyServer=function(input, output, session){
   return(sel_stock_obj)
   })
   
-  # observeEvent(input$button_1,{
-  #   if(input$procc_rpriors > 0 ) {
-  #     shinyWidgets::sendSweetAlert(
-  #       session = session,title = "Warning",
-  #       text = "If you have already run an analysis for a stock and you want to run a new one for another stock, it is advised to reload the app and start from scratch.", type = "warning")
-  #   }
-  #   if(input$button_1 > 0) {
-  #     if(input$txt1 %!in% test_CATCH_ID_All$Stock) {
-  #       shinyWidgets::sendSweetAlert(
-  #         session = session,title = "Error...",
-  #         text = "Oups !", type = "error")
-  #     } else {
-  #       newLine1 <- isolate(c(as.vector(test_CATCH_ID_All[test_CATCH_ID_All$Stock==input$txt1,1:26]),"selected"))
-  #       if (all(is.na(Stock_obj$Stocks$stock))){
-  #         Stock_obj$Stocks$stock[1]=input$txt1
-  #         Stock_obj$Catch_ID[1,]=c(newLine1,1)
-  #       } else {#if(input$txt1 %!in% Stock_obj$Stocks$stock)
-  #         Stock_obj$Stocks$stock[length(Stock_obj$Stocks$stock[!is.na(Stock_obj$Stocks$stock)])+1]=newLine1[4]
-  #         Stock_obj$Catch_ID[length(Stock_obj$Stocks$stock[!is.na(Stock_obj$Stocks$stock)]),]=c(newLine1,length(Stock_obj$Stocks$stock[!is.na(Stock_obj$Stocks$stock)]))
-  #       }
-  #     }
-  #   }
-  # })
-  # 
-  # observeEvent(input$button_1,{
-  #   if(input$button_1 > 0) {
-  #     if(input$txt1 %!in% test_CATCH_ID_All$Stock) {
-  #       shinyWidgets::sendSweetAlert(
-  #         session = session,
-  #         title = "Error...",
-  #         text = "Oups !",
-  #         type = "error"
-  #       )
-  #     } else {
-  #       newLine_catch_data <- isolate(cbind(
-  #         test_CATCH_data[test_CATCH_data$Stock==input$txt1,1:9],
-  #         Stock_objID=rep(Stock_obj$Catch_ID$Stock_objID[Stock_obj$Catch_ID$Stock_objID==max(Stock_obj$Catch_ID$Stock_objID)],
-  #                         nrow(test_CATCH_data[test_CATCH_data$Stock==input$txt1,])))
-  #       )
-  #       Stock_obj$Catch_data <- rbind(Stock_obj$Catch_data, newLine_catch_data)
-  #       # }
-  #     }}
-  # })
-  
+
  # output$see_stockID=renderTable({Stock_obj$Catch_ID})
   
   output$Stock_infobox_2=shinydashboard::renderValueBox({
@@ -1607,8 +1504,6 @@ shinyServer=function(input, output, session){
     shinyWidgets::updatePrettySwitch(session, "Smooth_bt_switch", value = xxx)
   })
   
-
-  
   observe({   #TRICK to erase things
     req(Final_stock())
     mnyr=min(Final_stock()$input$Input_data$yr,na.rm = T)
@@ -1618,7 +1513,6 @@ shinyServer=function(input, output, session){
     updateSliderInput(session, "yr_slct", value = c(starty,endy),min = mnyr, max =mxyr)
   })
 
-  
   observe({   #TRICK to erase things
     req(Final_stock())
     req(input$yr_slct)
@@ -1647,15 +1541,12 @@ shinyServer=function(input, output, session){
     updatePrettySwitch(session, "ecreepyes", value =xxx)
   })
   
-  
-  
   observe({
     req(Final_stock())
     xxx=ifelse(Final_stock()[["input"]][["Input_parameters"]]$CV_cpue==0.2 | is.na(Final_stock()[["input"]][["Input_parameters"]]$CV_cpue),FALSE,TRUE)
     updatePrettySwitch(session, "upMaterialbcv", value =xxx)
   })
-  
-  
+
   observe({
     req(Final_stock())
     xxxx=ifelse(is.na(Final_stock()[["input"]][["Input_parameters"]]$Ecreep_Year),input$bio_yr_slct[1],Final_stock()[["input"]][["Input_parameters"]]$Ecreep_Year)
@@ -1670,8 +1561,6 @@ shinyServer=function(input, output, session){
   
   #  url_palom= a("Link", href="https://doi.org/10.5751/ES-11136-240331")
   output$help_ecreep=renderUI({ shiny::h5(tagList("Note: Over time, fishers become more efficient at catching fish; a 2% increase in catchabilty per year is common (Palomares and Pauly 2019), https://doi.org/10.5751/ES-11136-240331",))})# url_palom
-  
-
 
   Catch_obj_=reactive({
     req(Final_stock())
@@ -1715,10 +1604,7 @@ shinyServer=function(input, output, session){
                                                                              connection may take a moment. Wait until the 'FishBase/SeaLifeBase info' box appears. If there is no Internet connection, a message will appear and you can enter the r-prior manually.
                                                                              Don't forget to press the 'Save input so far' button when you're done."),
                                 icon = shiny::icon("envelope"),color = "light-blue")})
-    
-   
-    
-    
+ 
     output$You_have_selected=renderUI({
      shiny::h5(HTML(paste0("You have selected the stock ",
                                                         tags$b(Final_stock()$input$Stock_info$Stock), " of the species ",
@@ -1753,15 +1639,12 @@ shinyServer=function(input, output, session){
           }
     })
     
-    
     observe({
       req(Final_stock())
       xxx=ifelse(is.na(Final_stock()[["input"]][["Input_parameters"]]$Resilience),"",Final_stock()[["input"]][["Input_parameters"]]$Resilience)
       updateSelectInput(session, "resilience_in", selected =xxx)
     })
-    
 
-    
     temp_rpriors=reactive({
       resili=input$resilience_in
       if (resili=="Very low"){
@@ -1789,9 +1672,7 @@ shinyServer=function(input, output, session){
     observe({
       updateSliderInput(session, "priors_rrange", value=c(temp_rpriors()[2],temp_rpriors()[3]))
     })
-    
-    
-    
+
     output$Res_rpriors=shinydashboard::renderValueBox({
       shinydashboard::valueBox(
         shiny::h4("Selected r priors"),shiny::h5(HTML(paste0("Resilience:    ", temp_rpriors()[1],br(),
@@ -1840,9 +1721,7 @@ shinyServer=function(input, output, session){
           color = "aqua",width = 8)
       }
     })
-    
-    
-    
+
     temp_expert_bk_start=reactive({
       expert_bk_start_=input$expert_bk_start
       if (expert_bk_start_=="Unexploited, 0.75-1.0"){
@@ -2026,7 +1905,6 @@ shinyServer=function(input, output, session){
     return(xx)
     })
     
-
     observe({
       updateSliderInput(session, "man_Bk_start", value = c( input$man_Bk_start_A[1], input$man_Bk_start_A[2]))
     })
@@ -2043,7 +1921,6 @@ shinyServer=function(input, output, session){
       updateSliderInput(session, "man_Bk_end", value = c( input$man_Bk_end_A[1], input$man_Bk_end_A[2]))
     })
     
-    
     Bk_obj=reactive({
       req(NBK())
       req(Catch_obj_())
@@ -2052,15 +1929,11 @@ shinyServer=function(input, output, session){
                         end_bio= c(input$man_Bk_end[1],input$man_Bk_end[2]), Plot=F)
       return(bkobj)
     })
-    
-    
-    
-    
+
     output$You_can_proceed_to_run=shinydashboard::renderValueBox({
       shinydashboard::valueBox( shiny::h4("You can now proceed to'Run the model' tab"),shiny::h5(" "),
                                 icon = shiny::icon("envelope"),color = "light-blue")})
-    
-    
+
     output$Biomass_plot_3= shiny::renderPlot({
       req(Bk_obj())
       print(Bk_obj()$pic)
@@ -2098,9 +1971,7 @@ shinyServer=function(input, output, session){
     })
     
     output$TESTNEURAL=renderTable({Fishbase_text()})
-    
-    
-    
+
     middle_outplts=eventReactive(input$Save_priors==T,{
       if (input$nbk_=="Only start") {
         outpts_m=data.frame(range=c(paste0(CLA_object()[["input"]][["Input_parameters"]]$StartYear, "-", CLA_object()[["input"]][["Input_parameters"]]$EndYear),
@@ -2134,11 +2005,7 @@ shinyServer=function(input, output, session){
       }            
       return(outpts_m) 
     })
-    
-    
-    
-    
-    
+ 
     output$middle_outputs <-renderPrint({middle_outplts()
     })
     
@@ -2172,8 +2039,7 @@ shinyServer=function(input, output, session){
       req(Final_stock())
       updateTextInput(session, "obj.name",value=paste0(Final_stock()$input$Stock_info$Stock, "_V1") ) #, placeholder=paste0("e.g.  ",Final_stock()[["Catch_ID"]]$Stock, "_V1")
     })
-    
-    
+
     object_NAME=reactive({
       req(CLA_object())
       if (input$obj.name=="") {
@@ -2187,12 +2053,14 @@ shinyServer=function(input, output, session){
     observeEvent(input$Save_priors, {
       req(object_NAME())
       CLA_obj <- CLA_object()
+      nm=object_NAME()
+      
+      
       dir.create( paste0(dir.name(),"/BSM_wd"))
-      dir=paste0(paste0(dir.name(),"/BSM_wd"))
+      dir=paste0(paste0(dir.name(),"/BSM_wd/"))
       
-      saveRDS(CLA_obj,file =paste0(dir,"/", object_NAME(), "_A.rds"))
+      saveRDS(CLA_obj,file =paste0(dir,"/","data_prep_CLA_object_", object_NAME(), "_A.rds"))
       Save_done <- showNotification(paste("Message:",  "The stock object with the input parameterization has been saved in ", paste0(dir.name(),"/BSM_wd/",object_NAME(), ".rds")), duration = 10)
-      
     })
     
     objects <- reactiveVal(data.frame(A.A=rep(NA,100),Created_Stocks=rep(NA,100)))
@@ -2211,8 +2079,7 @@ shinyServer=function(input, output, session){
         ) %>%
         # update data value
         objects()
-    }
-    )
+    })
     
     output$created_objects <- renderUI({
       renderTable({as.data.frame( objects()[!is.na( objects()$A.A),])})
@@ -2234,7 +2101,6 @@ shinyServer=function(input, output, session){
                                 color = "light-blue")
     })
     
-     
     BSM_run=eventReactive(input$Start_run,{
       CLA.fit(CLA_object(),METHOD="BSM")
     })
@@ -2253,7 +2119,6 @@ shinyServer=function(input, output, session){
       req(CLA_object_final())
       Model_run <- showNotification(paste("Message: ", "Model outcomes extracted"), duration = 5)
     })
-    
     
     observeEvent(input$Start_run,{   #SEE AFTER 5
       req(CLA_object_final())
@@ -2427,13 +2292,11 @@ shinyServer=function(input, output, session){
         Sys.sleep(0.05)
       }
     })
-    
-    
+
     ##### Kiel plot
     observeEvent(input$Start_run,{
       run_pictures$pic_M=ggkiel.plot(CLA_object_final(),"BSM") 
       pic_M_ready <- showNotification(paste("Message: ", "Kiel-plot ready"), duration = 5)
-      
     })
     
     output$kiel_plot= shiny::renderPlot({
@@ -2457,18 +2320,15 @@ shinyServer=function(input, output, session){
       #   }
       # })
 pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), duration = 5)
-
     })
     
     output$kobe_plot= shiny::renderPlot({
       run_pictures$pic_F
     })
-    
-    
+
     observeEvent(input$Start_run,{
       run_pictures$pic_G= ggmanagement.plot(CLA_object_final(),BSM_run(),"BSM")
       pic_G_ready <- showNotification(paste("Message: ", "Management graph ready"), duration = 5)
-      
     })
     
     output$Alexandros5= shiny::renderPlot({
@@ -2521,14 +2381,11 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
     observeEvent(input$Start_run, {
       req(CLA_object_final())
       req( run_pictures$pic_A)
-      
       CLA_object <- CLA_object_final()
-      
         nm=object_NAME()
-        
       dir.create(paste0(dir.name(),"/BSM_wd/outputs"))
       dir.create(paste0(dir.name(),"/BSM_wd/outputs/",nm))
-      device_="tiff"
+      device_="png"
       
       ggsave(filename=paste0(paste0(dir.name(),"/BSM_wd/outputs/",nm,"/","rk_pic."),device_),plot=run_pictures$pic_A, device =device_, width = 16, height =10, units = "cm",  dpi = 300)
       ggsave(filename=paste0(paste0(dir.name(),"/BSM_wd/outputs/",nm,"/","Catch_and_MSY."),device_),plot=run_pictures$pic_B, device =device_, width = 16, height =10, units = "cm",  dpi = 300)
@@ -2538,7 +2395,7 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
       ggsave(filename=paste0(paste0(dir.name(),"/BSM_wd/outputs/",nm,"/","Kobe_plot."),device_),plot=run_pictures$pic_F, device =device_, width = 16, height =10, units = "cm",  dpi = 300)
       ggsave(filename=paste0(paste0(dir.name(),"/BSM_wd/outputs/",nm,"/","Management_graphs."),device_),plot=run_pictures$pic_G, device =device_, width = 16, height =10, units = "cm",  dpi = 300)
       ggsave(filename=paste0(paste0(dir.name(),"/BSM_wd/outputs/",nm,"/","prior_posterior_distributions."),device_),plot=run_pictures$pic_H, device =device_, width = 16, height =10, units = "cm",  dpi = 300)
-      saveRDS(CLA_object,file =paste0(dir.name(),"/BSM_wd/outputs/",nm,"/","CLA_obj_",gsub(" ", "_",CLA_object[["input"]][["Stock_info"]][["ScientificName"]]), "_",Sys.Date(), "_final.rds"))
+      saveRDS(CLA_object,file =paste0(dir.name(),"/BSM_wd/outputs/",nm,"/","data_compl_CLA_object_",gsub(" ", "_",CLA_object[["input"]][["Stock_info"]][["ScientificName"]]), "_",Sys.Date(), "_final.rds"))
         write.csv(cbind(CLA_object[["input"]][["Stock_info"]],CLA_object[["input"]][["Input_parameters"]]), paste0(dir.name(),"/BSM_wd/outputs/",nm,"/input_parameters.csv"), row.names = F)
       write.csv(CLA_object[["output"]][["output_timeseries"]], paste0(dir.name(),"/BSM_wd/outputs/",nm,"/output_timeseries.csv"), row.names = TRUE)
       write.csv(CLA_object[["output"]][["output_posteriors"]], paste0(dir.name(),"/BSM_wd/outputs/",nm,"/output_posteriors.csv"), row.names = TRUE)
@@ -2552,7 +2409,6 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
       nm=object_NAME()
       #xxx= gg_summary.plot(CLA_object_final(),CLA_object_final()[["rk_object"]],BSM_run(),"BSM")
       run_pictures$pic_K= gg_summary.plot(CLA_object_final(),BSM_run(),"BSM")
-  
           ggsave(filename=paste0(paste0(dir.name(),"/BSM_wd/outputs/",nm,"/","Summary_pic."),device_),plot= run_pictures$pic_K, device =device_, width = 25, height =18, units = "cm",  dpi = 300)
       Save_done <- showNotification(paste("Message: ", "Summary outcomes are saved in your working directory"), duration = 5)
     })
@@ -2565,7 +2421,7 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
     observeEvent(input$Retrospective, {
       req( run_pictures$pic_J)
         nm=object_NAME()
-      device_="tiff"
+      device_="png"
       ggsave(filename=paste0(paste0(dir.name(),"/BSM_wd/outputs/",nm,"/","retrospective_pic."),device_),plot=run_pictures$pic_J, device =device_, width = 18, height =9, units = "cm",  dpi = 300)
       Save_done <- showNotification(paste("Message: ", "Retrospective outcomes are saved in your working directory"), duration = 5)
     })
@@ -2592,8 +2448,6 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
                                                    "Downward of counter-clockwise hooks or circles: extraordinary recruitment caused temporary non-sustainable increase in surplus production that was fished out by strongly increased catches taking more that the increased surplus production and thus shrinking biomass. Catches should be strongly reduced.")
     )})
     
-    
-    
     ###########################
     ###### RUN FORECAST  ######
     ###########################
@@ -2604,8 +2458,6 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
                                 icon = shiny::icon("envelope"),
                                 color = "light-blue")
     })
-    
-    
     
     output$scenaria <- renderUI({
       # req(Active_CVs())
@@ -2640,8 +2492,6 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
     
     CLA_FW <- CLA_FW %>% debounce(500)
     
-    
-    
     cla_fwd_summary= reactive({
       xx=interim.summary(CLA_FW())
       return(xx)
@@ -2661,8 +2511,7 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
       xx=advice.summary(CLA_FW())
       return(xx)
     })
-    
-    
+
     output$advice_outcomes= renderTable({
       req(cla_fwd_outcomes())
       xx=cla_fwd_outcomes()
@@ -2681,13 +2530,11 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
       ffmsy_forecast()
     })
     
-    
     bk_fwd=reactive({
       req(CLA_FW())
       xx=ggforecast.bk(CLA_object_final(),CLA_FW(),CI=input$for_CI)
       return(xx)
     })
-    
     
     output$bk_forecast= shiny::renderPlot({
       req(CLA_FW())
@@ -2695,31 +2542,26 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
       bk_fwd()
     })
     
-
     catch_fwd=reactive({
       req(CLA_FW())
       xx=ggforecast.catch(CLA_FW(),CI=input$for_CI)
       return(xx)
     })
-    
-    
+
     output$catch_forecast= shiny::renderPlot({
       req(catch_fwd())
       catch_fwd()
     })
-    
-    
+
     observe({
       req(CLA_FW())
         nm=object_NAME()
-       device_="tiff"
-      # 
+       device_="png"
        ggsave(filename=paste0(paste0(dir.name(),"/BSM_wd/outputs/",nm,"/","ffmsy_forecast."),device_),plot=ffmsy_forecast(), device =device_, width = 16, height =10, units = "cm",  dpi = 300)
        ggsave(filename=paste0(paste0(dir.name(),"/BSM_wd/outputs/",nm,"/","bk_forecast."),device_),plot=bk_fwd(), device =device_, width = 16, height =10, units = "cm",  dpi = 300)
        ggsave(filename=paste0(paste0(dir.name(),"/BSM_wd/outputs/",nm,"/","catch_forecast."),device_),plot=catch_fwd(), device =device_, width = 16, height =10, units = "cm",  dpi = 300)
        write.csv(CLA_FW()[["forward_df"]], paste0(dir.name(),"/BSM_wd/outputs/",nm,"/output_FORWARDs.csv"), row.names = TRUE)
       Save_done <- showNotification(paste("Message: ", "The forecast outcomes are saved in your working directory"), duration = 10)
-      
     })
     
     
@@ -2732,17 +2574,12 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
         # can happen when deployed).
         tempReport <- file.path(tempdir(), "report.Rmd")
         file.copy("report.Rmd", tempReport, overwrite = TRUE)
-        
         # Set up parameters to pass to Rmd document
-        
-        
         params <- list(obj = CLA_object_final(),
                        pic=    run_pictures$pic_K,
                        pic_F=    run_pictures$pic_F,
-                       pic_I= run_pictures$pic_M
-                       
+                       pic_I= run_pictures$pic_I
         )
-
         # Knit the document, passing in the `params` list, and eval it in a
         # child of the global environment (this isolates the code in the document
         # from the code in this app).
@@ -2753,7 +2590,6 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
       }
     )
     
-    
   observe({
     if (input$quit == 1) stopApp()
   })
@@ -2761,4 +2597,3 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
 }
 
 shinyApp(ui=shinyUI, server=shinyServer)
-
