@@ -2680,7 +2680,7 @@ gg_summary.plot= function(ABC.obj,fit_obj,METHOD) {
   #pic_3summary=ggrk_2.plot(ABC.obj,rk.obj,fit_obj,METHOD)+ggtitle("Analysis of viable r-k")
   pic_3summary=  ggkiel.plot(ABC.obj,METHOD)+ggtitle("Biomass and Catch plot")
   pic_4summary=ggbk.plot(ABC.obj,METHOD,Management=F)+ggtitle("Stock size")+geom_point(data=ABC.obj[["input"]][["Input_data"]],
-                                                                                       ggplot2::aes(x=yr,y=ABC.obj[["input"]][["Input_data"]][["bt"]]/
+                                                                                       ggplot2::aes(x=yr,y=ABC.obj[["input"]][["Input_data"]][["bt_smthd"]]/
                                                                                                       (ABC.obj[["output"]][["output_posteriors"]][["q_post"]][1]*
                                                                                                          ABC.obj[["output"]][["output_posteriors"]][["k_post"]][1])),shape=21,fill="gray")+
     scale_y_continuous(expand = expansion(mult = c(0, 0.02)))
