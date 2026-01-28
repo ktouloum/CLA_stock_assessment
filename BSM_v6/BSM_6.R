@@ -1765,16 +1765,31 @@ shinyServer=function(input, output, session){
                       ebk_stat_low=Final_stock()$input$Input_parameters$intb.low}
                   if (is.na(Final_stock()$input$Input_parameters$intb.hi)) {
                     ebk_stat_high=input$man_Bk_int_A[2] } else {
-                      ebk_stat_high=Final_stock()$input$Input_parameters$intb.hi}
-                  if (is.na(Final_stock()$input$Input_parameters$int.yr)) {
-                    ebk_stat_year=as.integer(floor((Catch_obj_()[["ct_data"]][c("yr","ct_smthd")]$yr[which(Catch_obj_()[["ct_data"]][c("yr","ct_smthd")]$ct_smthd>0)[1]]+max(as.integer(Catch_obj_()[["ct_data"]]$yr),na.rm = T))/2)) } else {
-                      ebk_stat_year=Final_stock()$input$Input_parameters$int.yr}
-                  
-                  # ebk_stat_low=input$man_Bk_start_A[1]
-                  # ebk_stat_high= input$man_Bk_start_A[2]
-                }
-      expert_bk_ind_priors=c(expert_bk_ind_,ebk_stat_low,ebk_stat_high,ebk_stat_year)
+                      ebk_stat_high=Final_stock()$input$Input_parameters$intb.hi}  }
+                  # if (is.na(Final_stock()$input$Input_parameters$int.yr)) {
+                  #   ebk_stat_year=as.integer(floor((Catch_obj_()[["ct_data"]][c("yr","ct_smthd")]$yr[which(Catch_obj_()[["ct_data"]][c("yr","ct_smthd")]$ct_smthd>0)[1]]+max(as.integer(Catch_obj_()[["ct_data"]]$yr),na.rm = T))/2)) } else {
+                  #     ebk_stat_year=Final_stock()$input$Input_parameters$int.yr}
+                  # # ebk_stat_low=input$man_Bk_start_A[1]
+                  # # ebk_stat_high= input$man_Bk_start_A[2]
+              
+      expert_bk_ind_priors=c(expert_bk_ind_,ebk_stat_low,ebk_stat_high)
     })
+    
+    
+    temp_expert_bk_ind_year=reactive({
+      if (is.na(Final_stock()$input$Input_parameters$int.yr)) {
+        ebk_stat_year=as.integer(floor((Catch_obj_()[["ct_data"]][c("yr","ct_smthd")]$yr[which(Catch_obj_()[["ct_data"]][c("yr","ct_smthd")]$ct_smthd>0)[1]]+max(as.integer(Catch_obj_()[["ct_data"]]$yr),na.rm = T))/2)) } else {
+          ebk_stat_year=Final_stock()$input$Input_parameters$int.yr}
+      # ebk_stat_low=input$man_Bk_start_A[1]
+      # ebk_stat_high= input$man_Bk_start_A[2]
+      
+      expert_bk_ind_year_priors=c(ebk_stat_year)
+    })
+    
+    
+    
+    
+    
     
     temp_expert_bk_end=reactive({
       expert_bk_end_=input$expert_bk_end
@@ -1818,7 +1833,7 @@ shinyServer=function(input, output, session){
     
     observe({
       req()
-      updateSliderInput(session, "man_Bk_int_year_A", value = as.numeric(temp_expert_bk_ind()[4]),min = min(Catch_obj_()[["ct_data"]]$yr), max =max(Catch_obj_()[["ct_data"]]$yr))
+      updateSliderInput(session, "man_Bk_int_year_A", value = as.numeric(temp_expert_bk_ind_year()[1]),min = min(Catch_obj_()[["ct_data"]]$yr), max =max(Catch_obj_()[["ct_data"]]$yr))
     })
     
     observe({
