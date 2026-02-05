@@ -975,7 +975,7 @@ shinyUI <- shinydashboard::dashboardPage(#skin = "purple",
                                                title ='Diagnostics',
                                                trigger="diag_trigger",
                                                size = "large",
-                                               shinycssloaders::withSpinner(shiny::plotOutput('Diagnostics.plot')),
+                                               shinycssloaders::withSpinner(shiny::plotOutput('Diagnostics_plot')),
                                                shiny::h5("Diagnostics showing (A) the fit of the predicted to the observed catch, (B) the fit of predicted to observed CPUE, (C) the deviation from observed to predicted biomass, and (D) an analysis of the log-CPUE residuals, which should preferably be randomly distributed, and which may have a red warning background if some residuals exceed value +/- 0.3, suggesting that stronger smoothing of cpue may be appropriate.")
                               ),
                               shinyBS::bsModal(id='modalExample4',
@@ -1113,7 +1113,7 @@ shinyUI <- shinydashboard::dashboardPage(#skin = "purple",
 ############    SERVER    ############
 ############ ############ ############
 shinyServer=function(input, output, session){
-  
+   
   shinyWidgets::useSweetAlert()
   
   output$adv_up1= shinydashboard::renderValueBox({
@@ -1908,6 +1908,8 @@ shinyServer=function(input, output, session){
                                                  "pretty good catch; good catch per effort; high profits; many large fish; healthy size/age structure; high abundance throughout area; regular recruitment; healthy fishery",
                                                  " underdeveloped fishery; underfished; low market demand; only occasional catches; only bycatch; not vulnerable to common gears")
     )})
+   
+     outputOptions(output, "helpTable", suspendWhenHidden = FALSE)
     
     
     observe({
@@ -2362,16 +2364,23 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
     output$PriorPosterior <- shiny::renderPlot({
       run_pictures$pic_H
     })
+ 
+       outputOptions(output, "Alexandros5", suspendWhenHidden = FALSE)
+    outputOptions(output, "PriorPosterior", suspendWhenHidden = FALSE)
+    
+    
     
     observeEvent(input$Start_run,{
       run_pictures$pic_I= ggpdiagnostics.plot(CLA_object_final(),BSM_run(),"BSM")
       pic_I_ready <- showNotification(paste("Message: ", "Diagnostics graph ready"), duration = 5)
     })
     
-    output$Diagnostics.plot <- shiny::renderPlot({
+    output$Diagnostics_plot <- shiny::renderPlot({
       run_pictures$pic_I
     })
-    
+
+    outputOptions(output, "Diagnostics_plot", suspendWhenHidden = FALSE)
+
     CLA_retro=eventReactive(input$Retrospective,{
       req(CLA_object_final())
       xx= retro.fit(CLA_object_final(),input$retro_range,"BSM")
@@ -2385,6 +2394,8 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
     output$retro_pics= shiny::renderPlot({
       run_pictures$pic_J
     })#,height = 300
+    
+    outputOptions(output, "retro_pics", suspendWhenHidden = FALSE)
     
     observeEvent(input$Retrospective, {
       for (i in 1:100) {
@@ -2436,7 +2447,9 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
     output$Summary_plot <- shiny::renderPlot({
       run_pictures$pic_K
     })
-
+    outputOptions(output, "Summary_plot", suspendWhenHidden = FALSE)
+    
+    
     observeEvent(input$Retrospective, {
       req( run_pictures$pic_J)
         nm=object_NAME()
@@ -2466,6 +2479,7 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
                                                    "surplus production increased followed by stock increase followed by decrease in production and biomass. If it is a circle, then this is probably caused by extraordinary good recruitment and catches should not be increased because future recruitment will be less and biomass will decrease again. If it is a hook that stays up, then this is caused by a strong decrease in catch. Keeping the new catch level will keep biomass at the present level.",
                                                    "Downward of counter-clockwise hooks or circles: extraordinary recruitment caused temporary non-sustainable increase in surplus production that was fished out by strongly increased catches taking more that the increased surplus production and thus shrinking biomass. Catches should be strongly reduced.")
     )})
+    outputOptions(output, "helpTablerk", suspendWhenHidden = FALSE)
     
     ###########################
     ###### RUN FORECAST  ######
