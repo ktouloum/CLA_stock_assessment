@@ -182,14 +182,14 @@ fbsb_table_2 <- function(spec.code) {
   thepage_picker=c(sum(nchar(pages[[1]])),sum(nchar(pages[[2]])), sum(nchar(pages[[3]])),sum(nchar(pages[[4]])))
   Table2=pages[[which.max(thepage_picker)]]
   if (ncol(Table2)>0 & nrow(Table2)>0) {
-    Table2=Table2[,c("Loo.cm.","Length.Type",  "Sex" ,"Lm" ,"Country","Locality","Questionable", "Captive")]
+    Table2=Table2[,c("Loo.cm.","Length.Type",  "Sex" ,"Lm" ,"Territory","Locality","Questionable", "Captive")]
     Table2=Table2[Table2$Questionable!="Yes",] 
     Table2=Table2[Table2$Captive!="Yes",]
     Table2=Table2[,1:6]
     colnames(Table2)[1]="Linf"
     colnames(Table2)[2]="L.type"
     if ( nrow(Table2)>0) {
-      Table2$Locality=paste0(Table2$Locality, ", ",Table2$Country)
+      Table2$Locality=paste0(Table2$Locality, ", ",Table2$Territory)
       Table2=Table2[,c(1:4,6)]
       Table2=Table2[!is.na(Table2$Linf), ]} else {
         Table2=data.frame( Fishbase.SeaLifeBase="No information found")
@@ -228,9 +228,9 @@ fbsb_table_mat <- function(spec.code) {
   Table1$Length.range[Table1$Length.range== "NA-NA"]=""
   Table1$age.range=paste0(Table1$Age.range.y.,Table1$Age.range.y..1,Table1$Age.range.y..2)
   Table1$age.range[Table1$age.range== "NA-NA"]=""
-  Table1$Locality=paste(Table1$Country,Table1$Locality,sep = ", ")
+  Table1$Locality=paste(Table1$Territory,Table1$Locality,sep = ", ")
   Table1$Lm.cm.=gsub(" TL","", Table1$Lm.cm.)
-  Table1=Table1[,c( "Lm.cm.","Length.range",  "age.range", "tm.y.",   "Sex.of.fish", "Locality"     )]
+  Table1=Table1[,c( "Lm.cm.","Length.range",  "age.range", "tm.y.",   "Sex", "Locality"     )]
   colnames(Table1)=c("Lm.cm","Length.range", "Age.range","tm.y","Sex","Locality")
   return(Table1)
 }
