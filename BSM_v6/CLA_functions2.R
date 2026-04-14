@@ -808,13 +808,6 @@ Bio_obj=function(inp,start_yr=NA, end_yr=NA,smoother_bw=1,ecreep=F,ecreep_yr=NA,
 
 
 Biom_priors=function(Catch.obj,nbk=3,start_bio,int_bio,int_bio_year,end_bio, Plot=T) {  #ANN_priors=T,
-  
-  Bpriors=Biom_priors(Cobj,nbk=3,start_bio=c(0.85,1.05),
-                      int_bio=c(0.01,0.1), int_bio_year=2000,end_bio=c(0.01,0.1), Plot=T)
-  
-  Catch.obj=Cobj
-  
-  
   Stock_states=c("Very low","Low","Medium","Sustainable","Unexploited")
   
   if (start_bio[1] %in%  Stock_states) {
