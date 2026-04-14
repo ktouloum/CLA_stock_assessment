@@ -361,7 +361,7 @@ ANN.priors=function(Catch.obj,MSY,Catch_start_year, Catch_end_year ) {
   min_max= Catch.obj$ct_data$ct_smthd[which.min(Catch.obj$ct_data$ct_smthd)]/ Catch.obj$ct_data$ct_smthd[which.max(Catch.obj$ct_data$ct_smthd)]
   nyr          <- length(Catch.obj$ct_data$yr) # number of years in the time series
   if(min_max > 0.7) { # if catch is about flat, use middle year as int.yr
-    int.yr    <- as.integer(mean(c(Catch_start_year, Catch_start_year)))
+    int.yr    <- as.integer(mean(c(Catch_start_year, Catch_end_year)))
   } else { # only consider catch 5 years away from end points and within last 30 years # 50
     yrs.int       <- Catch.obj$ct_data$yr[Catch.obj$ct_data$yr>(Catch.obj$ct_data$yr[nyr]-30) & Catch.obj$ct_data$yr>Catch.obj$ct_data$yr[4] & Catch.obj$ct_data$yr<Catch.obj$ct_data$yr[nyr-4]]
     ct.int        <- Catch.obj$ct_data$ct_smthd[Catch.obj$ct_data$yr>(Catch.obj$ct_data$yr[nyr]-30) & Catch.obj$ct_data$yr>Catch.obj$ct_data$yr[4] & Catch.obj$ct_data$yr<Catch.obj$ct_data$yr[nyr-4]]
@@ -809,6 +809,12 @@ Bio_obj=function(inp,start_yr=NA, end_yr=NA,smoother_bw=1,ecreep=F,ecreep_yr=NA,
 
 Biom_priors=function(Catch.obj,nbk=3,start_bio,int_bio,int_bio_year,end_bio, Plot=T) {  #ANN_priors=T,
   
+  Bpriors=Biom_priors(Cobj,nbk=3,start_bio=c(0.85,1.05),
+                      int_bio=c(0.01,0.1), int_bio_year=2000,end_bio=c(0.01,0.1), Plot=T)
+  
+  Catch.obj=Cobj
+  
+  
   Stock_states=c("Very low","Low","Medium","Sustainable","Unexploited")
   
   if (start_bio[1] %in%  Stock_states) {
@@ -897,8 +903,8 @@ Biom_priors=function(Catch.obj,nbk=3,start_bio,int_bio,int_bio_year,end_bio, Plo
   MAN_Priors=data.frame(start=strprrs,int=intprrs,end=endprrs)   ########SWITCHER OFF
   # if(ANN_priors==T){
   msy=MSY.calculator(Catch.obj)
-  Catch_start_year=Catch.obj$ct_param$start_yr
-  Catch_end_year=Catch.obj$ct_param$end_yr
+  Catch_start_year=Catch.obj[["ct_param"]][["start_yr"]]
+  Catch_end_year=Catch.obj[["ct_param"]][["end_yr"]]
 
   ANN_priors=ANN.priors(Catch.obj,msy,Catch_start_year, Catch_end_year)
   # }
