@@ -1208,6 +1208,7 @@ shinyServer=function(input, output, session){
     })
     return(df)
   })
+  
   output$contents <-  DT::renderDataTable({ inp_data()
     DT::datatable( inp_data(),
                    options = list(lengthMenu = c(5, 10, 20), pageLength = 5))
@@ -1440,7 +1441,6 @@ shinyServer=function(input, output, session){
   ################################################################
   
   #########SELECT STOCK TO WORK WITH PRIORS
-
   Final_stock=eventReactive(input$prepare_data,{
    if (input$last_btn=="button_1") {
      fs=Selected_stock_object()

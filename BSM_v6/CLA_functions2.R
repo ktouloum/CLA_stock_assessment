@@ -355,13 +355,13 @@ MSY.calculator=function(catch.obj) {
   return(MSY.pr)
 }
 
-ANN.priors=function(Catch.obj,MSY ) {
+ANN.priors=function(Catch.obj,MSY,Catch_start_year, Catch_end_year ) {
   nn_file<- "ffnn.bin"
   #   req(input$Priors_but2)
   min_max= Catch.obj$ct_data$ct_smthd[which.min(Catch.obj$ct_data$ct_smthd)]/ Catch.obj$ct_data$ct_smthd[which.max(Catch.obj$ct_data$ct_smthd)]
   nyr          <- length(Catch.obj$ct_data$yr) # number of years in the time series
   if(min_max > 0.7) { # if catch is about flat, use middle year as int.yr
-    int.yr    <- as.integer(mean(c(input$yr_slct[1], input$yr_slct[2])))
+    int.yr    <- as.integer(mean(c(Catch_start_year, Catch_start_year)))
   } else { # only consider catch 5 years away from end points and within last 30 years # 50
     yrs.int       <- Catch.obj$ct_data$yr[Catch.obj$ct_data$yr>(Catch.obj$ct_data$yr[nyr]-30) & Catch.obj$ct_data$yr>Catch.obj$ct_data$yr[4] & Catch.obj$ct_data$yr<Catch.obj$ct_data$yr[nyr-4]]
     ct.int        <- Catch.obj$ct_data$ct_smthd[Catch.obj$ct_data$yr>(Catch.obj$ct_data$yr[nyr]-30) & Catch.obj$ct_data$yr>Catch.obj$ct_data$yr[4] & Catch.obj$ct_data$yr<Catch.obj$ct_data$yr[nyr-4]]
@@ -677,8 +677,6 @@ Catch_obj=function(inp,start_yr=NA, end_yr=NA,smoother_bw=1,Catch_CV=0.15,Plot=T
 }
 
 
-
-
 Bio_obj=function(inp,start_yr=NA, end_yr=NA,smoother_bw=1,ecreep=F,ecreep_yr=NA,ecreepvalue=2,Biom_type=c("CPUE","Biomass")[1],CPUE_CV=0.2,Plot=T,ShowCV=T) {
   if (all(is.na(inp$bt))) {
     print("There is no biomass index in the dataset")
@@ -899,7 +897,10 @@ Biom_priors=function(Catch.obj,nbk=3,start_bio,int_bio,int_bio_year,end_bio, Plo
   MAN_Priors=data.frame(start=strprrs,int=intprrs,end=endprrs)   ########SWITCHER OFF
   # if(ANN_priors==T){
   msy=MSY.calculator(Catch.obj)
-  ANN_priors=ANN.priors(Catch.obj,msy)
+  Catch_start_year=Catch.obj$ct_param$start_yr
+  Catch_end_year=Catch.obj$ct_param$end_yr
+
+  ANN_priors=ANN.priors(Catch.obj,msy,Catch_start_year, Catch_end_year)
   # }
   bk_priors=list(MAN_Priors=MAN_Priors,ANN_priors=ANN_priors,params=data.frame(nbk=nbk,msy=msy))
   pic=ggbkpriors.plot(Catch.obj,bk_priors)
