@@ -1,0 +1,106 @@
+---
+title: "BSM Stock assessment report"
+output: html_document
+params:
+  obj: NA
+  pic: NULL
+  pic_F: NULL
+  pic_I: NULL
+---
+
+<br>
+<p style="font-size:20px; font-weight:bold;">
+Stock: `r params$obj[["input"]][["Stock_info"]][["Stock"]]`
+</p>
+<p style="font-size:20px; font-weight:bold;">
+Species: *`r params$obj[["input"]][["Stock_info"]][["ScientificName"]]`*
+</p>
+
+<br>
+<br>
+<div style="background-color:#e0f7fa; border:1px solid #00acc1; 
+            border-radius:8px; padding:10px; font-weight:bold; 
+            color:#000000; text-align:left;">
+<p style="font-size:20px; font-weight:bold;">
+The B/B0 value for the last year of the assessment is 
+</p>
+</div>
+<br>
+
+
+```{r, echo=FALSE, results='asis'}
+
+#cat("<div style='font-size:18px;'>")
+
+cat("<div style='font-size:18px;'>",
+    round(params$obj[["output"]][["output_timeseries"]][["bk"]][length(params$obj[["output"]][["output_timeseries"]][["bk"]])], 3),
+    "</div>")
+
+#cat("</div>")
+
+```
+
+<br>
+<br>
+
+<div style="background-color:#e0f7fa; border:1px solid #00acc1; 
+            border-radius:8px; padding:10px; font-weight:bold; 
+            color:#000000; text-align:left;">
+<p style="font-size:20px; font-weight:bold;">
+Assessment summary input and output
+</p>
+</div>
+<br>
+
+
+```{r, echo=FALSE}
+
+CLA.summary(params$obj)
+
+```
+
+<br>
+<br>
+<div style="background-color:#e0f7fa; border:1px solid #00acc1; 
+            border-radius:8px; padding:10px; font-weight:bold; 
+            color:#000000; text-align:left;">
+<p style="font-size:20px; font-weight:bold;">
+Assessment summary graphs
+</p>
+</div>
+<br>
+
+
+```{r, fig.width=10, fig.height=6, echo=FALSE}
+params$pic
+```
+<br>
+<br>
+<div style="background-color:#e0f7fa; border:1px solid #00acc1; 
+            border-radius:8px; padding:10px; font-weight:bold; 
+            color:#000000; text-align:left;">
+<p style="font-size:20px; font-weight:bold;">
+Kobe plot
+</p>
+</div>
+<br>
+
+```{r, fig.width=12, fig.height=8, echo=FALSE}
+params$pic_F
+```
+<br>
+<br>
+<div style="background-color:#e0f7fa; border:1px solid #00acc1; 
+            border-radius:8px; padding:10px; font-weight:bold; 
+            color:#000000; text-align:left;">
+<p style="font-size:20px; font-weight:bold;">
+Assessment diagnostics
+</p>
+</div>
+<br>
+
+```{r, fig.width=10, fig.height=6, echo=FALSE}
+params$pic_I
+```
+
+
