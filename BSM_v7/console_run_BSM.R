@@ -11,6 +11,7 @@ library(R2jags)
 library(dplyr)
 library(data.table)
 library(tidyr)
+library(scales)
 
 
 source("CLA_functions2.R")

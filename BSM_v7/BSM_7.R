@@ -44,7 +44,7 @@ library(shinycssloaders)
 library(tidyr)
 library(dplyr)
 library(datamods)
-#library(plotly)
+library(scales)
 library(purrr)
 library(rmarkdown)
 
@@ -1313,7 +1313,8 @@ shinyServer=function(input, output, session){
       ggplot2::geom_line(color="blue",size=1)+ggplot2::labs(y="Catch", x="Year")+
       ggplot2::geom_point(color="black",size=2)+
       ggplot2::theme_classic(base_size = fs)+
-      ggplot2::scale_y_continuous(limits=c(0,NA))
+      ggplot2::scale_y_continuous(limits=c(0,NA))+
+      ggplot2::scale_x_continuous(breaks = breaks_pretty(n=length(created_stock_object()[["input"]][["Input_data"]]$yr)/5))
   }, height = 200)
   
   output$Biomass_plot2= shiny::renderPlot({
@@ -1323,7 +1324,8 @@ shinyServer=function(input, output, session){
       ggplot2::geom_line(color="blue",size=1)+ggplot2::labs(y="CPUE", x="Year")+
       ggplot2::geom_point(color="black",size=2)+
       ggplot2::theme_classic(base_size = fs)+
-      ggplot2::scale_y_continuous(limits=c(0,NA))
+      ggplot2::scale_y_continuous(limits=c(0,NA))+
+      ggplot2::scale_x_continuous(breaks = breaks_pretty(n=length(created_stock_object()[["input"]][["Input_data"]]$yr)/5))
   }, height = 200)
   
   
@@ -1405,7 +1407,9 @@ shinyServer=function(input, output, session){
       ggplot2::geom_line(color="blue",size=1)+ggplot2::labs(y="Catch", x="Year")+
       ggplot2::geom_point(color="black",size=2)+
       ggplot2::theme_classic(base_size = fs)+
-      ggplot2::scale_y_continuous(limits=c(0,NA)) 
+      ggplot2::scale_y_continuous(limits=c(0,NA))+
+      ggplot2::scale_x_continuous(breaks = breaks_pretty(n=length(dt$yr)/5))
+    
   }, height = 200)
   
   output$Biomass_plot= shiny::renderPlot({
@@ -1420,7 +1424,8 @@ shinyServer=function(input, output, session){
       ggplot2::geom_line(color="blue",size=1)+ggplot2::labs(y="CPUE", x="Year")+
       ggplot2::geom_point(color="black",size=2)+
       ggplot2::theme_classic(base_size = fs)+
-      ggplot2::scale_y_continuous(limits=c(0,NA)) 
+      ggplot2::scale_y_continuous(limits=c(0,NA)) +
+      ggplot2::scale_x_continuous(breaks = breaks_pretty(n=length(dt$yr)/5))
     p2
   }, height = 200)
   
@@ -1490,7 +1495,8 @@ shinyServer=function(input, output, session){
     ggplot()+geom_line(data = xx,aes(x=yr,y=ct),col="blue")+
       geom_point(data = xx,aes(x=yr,y=ct))+
       scale_y_continuous(limits = c(0,NA))+labs(x="Year",y="Catch")+
-      ggplot2::theme_classic(base_size = fs)
+      ggplot2::theme_classic(base_size = fs)+
+      ggplot2::scale_x_continuous(breaks = breaks_pretty(n=length(xx$yr)/5))
   })
   
   
@@ -1503,7 +1509,8 @@ shinyServer=function(input, output, session){
     ggplot()+geom_line(data = xx,aes(x=yr,y=bt),col="blue")+
       geom_point(data = xx,aes(x=yr,y=bt))+scale_y_continuous(limits = c(0,NA))+
       labs(x="Year",y="CPUE")+
-      ggplot2::theme_classic(base_size = fs)
+      ggplot2::theme_classic(base_size = fs)+
+      ggplot2::scale_x_continuous(breaks = breaks_pretty(n=length(xx$yr)/5))
   })
   
   
@@ -1954,13 +1961,13 @@ shinyServer=function(input, output, session){
       end=input$man_Bk_end_A
       
       temp=data.frame(yr=c(start_yr,input$man_Bk_int_year_A,end_yr),ln=c(mean(start),mean(ind),mean(end)))
-      
-      if (!isTruthy(input$file_LBB)) {
+
+            if (!isTruthy(input$file_LBB)) {
         p2= ggplot2::ggplot() +
           ggplot2::geom_errorbar(aes(x=start_yr, ymin=start[1], ymax=start[2],color="A"), width=0.4, size=1.5)+
           ggplot2::geom_errorbar(aes(x=input$man_Bk_int_year_A, ymin=ind[1], ymax=ind[2],color="A"), width=0.4, size=1.5)+
           ggplot2::geom_errorbar(aes(x=end_yr, ymin=end[1], ymax=end[2],color="A"), width=0.4, size=1.5)+
-          #  ggplot2::scale_x_continuous(breaks=seq(start_yr,end_yr,2))+
+          ggplot2::scale_x_continuous(breaks = breaks_pretty(n=length(Catch_obj_()[["ct_data"]]$yr)/5))+
           ggplot2::scale_y_continuous(breaks=seq(0,1.25,0.1),limits = c(0,1.25))+
           ggplot2::geom_hline( ggplot2::aes(yintercept=0.5,linetype="B"),color = "black")+
           ggplot2::geom_line(data=temp, ggplot2::aes(x=yr,y=ln,color="A"),size=1)+
@@ -1983,7 +1990,7 @@ shinyServer=function(input, output, session){
           ggplot2::geom_errorbar(aes(x=end_yr, ymin=end[1], ymax=end[2],linetype="C"),color="blue", width=1, size=1)+
           ggplot2::geom_line(data=temp, ggplot2::aes(x=yr,y=ln,linetype="C"),color="blue",size=1)+
           ggplot2::geom_hline( ggplot2::aes(yintercept=0.5,linetype="D"),color = "black")+
-          #  ggplot2::scale_x_continuous(breaks=seq(start_yr,end_yr,2))+
+          ggplot2::scale_x_continuous(breaks = breaks_pretty(n=length(Catch_obj_()[["ct_data"]]$yr)/5))+
           ggplot2::scale_y_continuous(breaks=seq(0,1.25,0.1),limits = c(0,1.25))+
           ggplot2::scale_color_manual(values=c("green"),labels=c("LBB B/k priors"))+
           ggplot2::scale_linetype_manual(values=c("solid","dashed"),labels=c("Expert priors","Bmsy"))+
@@ -2578,7 +2585,7 @@ pic_F_ready <- showNotification(paste("Message: ", "Kobe plot graph ready"), dur
       # dir.create(paste0(dir.name(),"/BSM_wd/outputs"))
       # dir.create(paste0(dir.name(),"/BSM_wd/outputs/",nm))
       run_pictures$pic_K= gg_summary.plot(CLA_object_final(),BSM_run(),"BSM")
-          ggsave(filename=paste0(paste0(dir.name(),"/BSM_wd/outputs/",nm,"/","Summary_pic."),device_),plot= run_pictures$pic_K, device =device_, width = 25, height =18, units = "cm",  dpi = 300)
+          ggsave(filename=paste0(paste0(dir.name(),"/BSM_wd/outputs/",nm,"/","Summary_pic."),device_),plot= run_pictures$pic_K, device =device_, width = 27, height =18, units = "cm",  dpi = 300)
       Save_done <- showNotification(paste("Message: ", "Summary outcomes are saved in your working directory"), duration = 5)
     })
     
