@@ -636,6 +636,11 @@ Catch_obj=function(inp,start_yr=NA, end_yr=NA,smoother_bw=1,Catch_CV=0.15,Plot=T
   minyr=min(inp$yr[!is.na(inp$ct)])
   maxyr=max(inp$yr[!is.na(inp$ct)])
   nyr=length(inp$yr)
+  if(nyr <41) {
+    brks=nyr/5
+  } else {
+    brks=nyr/10
+  }
   ct_obj=data.frame(yr=seq(minyr,maxyr,1))
   ct_obj=merge(x = ct_obj, y = inp, all.x = TRUE)
   if( is.na(start_yr)) {
@@ -655,7 +660,7 @@ Catch_obj=function(inp,start_yr=NA, end_yr=NA,smoother_bw=1,Catch_CV=0.15,Plot=T
   if (ShowCV==F) {  
     p1= ggplot2::ggplot(data=ct_obj,ggplot2::aes(x=yr)) +
       ggplot2::scale_y_continuous(limits = c(0,1.1*max(c(ct_obj$ct,upper_cv),na.rm = T)))+
-      ggplot2::scale_x_continuous(limits = c(min(ct_obj$yr,na.rm=T)-1,max(ct_obj$yr,na.rm=T)+1),breaks = breaks_pretty(n=nyr/5))+
+      ggplot2::scale_x_continuous(limits = c(min(ct_obj$yr,na.rm=T)-1,max(ct_obj$yr,na.rm=T)+1),breaks = breaks_pretty(n=brks))+
       ggplot2::geom_line(ggplot2::aes(y=ct_smthd, color="A"),size=1)+
       ggplot2::geom_line(ggplot2::aes(y=ct,color="B"),size=1)+
       # geom_ribbon(ggplot2::aes(ymin =lower_cv, ymax =upper_cv,fill = "A"),linetype="dashed", alpha=0.3)+
@@ -668,7 +673,7 @@ Catch_obj=function(inp,start_yr=NA, end_yr=NA,smoother_bw=1,Catch_CV=0.15,Plot=T
   } else {
     p1=  ggplot2::ggplot(data=ct_obj,ggplot2::aes(x=yr)) +
       ggplot2::scale_y_continuous(limits = c(0,1.1*max(c(ct_obj$ct,upper_cv),na.rm = T)))+
-      ggplot2::scale_x_continuous(limits = c(min(ct_obj$yr,na.rm=T)-1,max(ct_obj$yr,na.rm=T)+1),breaks = breaks_pretty(n=nyr/5))+
+      ggplot2::scale_x_continuous(limits = c(min(ct_obj$yr,na.rm=T)-1,max(ct_obj$yr,na.rm=T)+1),breaks = breaks_pretty(n=brks))+
       ggplot2::geom_line(ggplot2::aes(y=ct_smthd, color="A"),size=1)+
       ggplot2::geom_line(ggplot2::aes(y=ct,color="B"),size=1)+
       ggplot2::geom_ribbon(ggplot2::aes(ymin =lower_cv, ymax =upper_cv,fill = "A"),linetype="dashed", alpha=0.3)+
@@ -737,6 +742,11 @@ Bio_obj=function(inp,start_yr=NA, end_yr=NA,smoother_bw=1,ecreep=F,ecreep_yr=NA,
   temp_bio_obj$lower_cv=(1- CPUE_CV)*temp_bio_obj$bt_smthd
   temp_bio_obj$upper_cv=(1+ CPUE_CV)*temp_bio_obj$bt_smthd
   nyr=length(temp_bio_obj$yr)
+  if(nyr <41) {
+    brks=nyr/5
+  } else {
+    brks=nyr/10
+  }
   if (ShowCV==F) {  
     p_1= ggplot2::ggplot(data=temp_bio_obj,ggplot2::aes(x=yr)) +
       ggplot2::geom_line(ggplot2::aes(y=bt_smthd, color="B"),size=1)+
@@ -746,7 +756,7 @@ Bio_obj=function(inp,start_yr=NA, end_yr=NA,smoother_bw=1,ecreep=F,ecreep_yr=NA,
       ggplot2::scale_color_manual(labels=c("Raw CPUE","Smoothed CPUE"),values=c("blue","red"))+
       ggplot2::theme(legend.position="bottom") +
       ggplot2::scale_y_continuous(limits = c(0,1.1*max(c(temp_bio_obj$bt,temp_bio_obj$upper_cv),na.rm = T)))+
-     ggplot2::scale_x_continuous(breaks = breaks_pretty(n=nyr/5))
+     ggplot2::scale_x_continuous(breaks = breaks_pretty(n=brks))
     if (ecreep==T ) {#|input$ecreepslider>0
       
       p_1= ggplot2::ggplot(data=temp_bio_obj,ggplot2::aes(x=yr)) +
@@ -756,7 +766,7 @@ Bio_obj=function(inp,start_yr=NA, end_yr=NA,smoother_bw=1,ecreep=F,ecreep_yr=NA,
         ggplot2::theme_classic()+
         ggplot2::theme(legend.position="bottom") +
         ggplot2::scale_y_continuous(limits = c(0,1.1*max(c(temp_bio_obj$bt,temp_bio_obj$upper_cv),na.rm = T)))+
-        ggplot2::scale_x_continuous(breaks = breaks_pretty(n=nyr/5))+
+        ggplot2::scale_x_continuous(breaks = breaks_pretty(n=brks))+
       ggplot2::geom_line(ggplot2::aes(x=yr,y=ecreep, color="C"),size=1)+
         # ggplot2::annotate("point", x=ecreep_year,y=temp_bio_obj$bt[temp_bio_obj$yr==ecreep_year],shape="E-creep effect start year",size=4)+
         ggplot2::geom_point(ggplot2::aes(x=ecreep_year,y=bt[yr==ecreep_year],shape="E-creep effect start year"),size=4)+
@@ -765,7 +775,6 @@ Bio_obj=function(inp,start_yr=NA, end_yr=NA,smoother_bw=1,ecreep=F,ecreep_yr=NA,
         ggplot2::scale_color_manual(labels=c("Raw CPUE","Smoothed CPUE","E-creeped CPUE" ),
                                     values=c("blue","red","green"))
     }
-    
   } else {
     p_1= ggplot2::ggplot(data=temp_bio_obj,ggplot2::aes(x=yr)) +
       ggplot2::geom_line(ggplot2::aes(y=bt_smthd, color="B"),size=1)+
@@ -778,7 +787,7 @@ Bio_obj=function(inp,start_yr=NA, end_yr=NA,smoother_bw=1,ecreep=F,ecreep_yr=NA,
       ggplot2::theme(legend.position="bottom") +
       ggplot2::scale_y_continuous(limits = c(0,1.1*max(c(temp_bio_obj$bt,temp_bio_obj$upper_cv),na.rm = T)))+
       ggplot2::labs(y="CPUE", x="Year",title="CPUE data",color="",fill="",shape="")+
-    ggplot2::scale_x_continuous(breaks = breaks_pretty(n=nyr/5))
+    ggplot2::scale_x_continuous(breaks = breaks_pretty(n=brks))
       if (ecreep==T ) {  
       
       p_1=ggplot2::ggplot(data=temp_bio_obj,ggplot2::aes(x=yr)) +
@@ -791,7 +800,7 @@ Bio_obj=function(inp,start_yr=NA, end_yr=NA,smoother_bw=1,ecreep=F,ecreep_yr=NA,
         #ggplot2::scale_color_manual(labels=c("Raw CPUE","Smoothed CPUE"),values=c("blue","red"))+
         ggplot2::theme(legend.position="bottom") +
         # ggplot2::scale_y_continuous(limits = c(0,1.1*max(c(temp_bio_obj$bt,upper_cv),na.rm = T)))+
-        ggplot2::scale_x_continuous(breaks = breaks_pretty(n=nyr/5))+
+        ggplot2::scale_x_continuous(breaks = breaks_pretty(n=brks))+
       ggplot2::geom_line(ggplot2::aes(x=yr,y=ecreep, color="C"),size=1)+
         ggplot2::geom_point(ggplot2::aes(x=ecreep_year,y=bt[yr==ecreep_year],shape="E-creep effect start year"),size=4)+
         ggplot2::scale_y_continuous(limits = c(0,1.1*max(c(temp_bio_obj$upper_cv,temp_bio_obj$bt), na.rm = T)))+
@@ -931,13 +940,18 @@ ggbkpriors.plot=function(Catch.obj,bk_priors) {
   int_year_man=bk_priors$MAN_Priors$int[3]
   int_year_ANN=bk_priors$ANN_priors$int[3]
   nyr=length(Cbj$yr)
+  if(nyr <41) {
+    brks=nyr/5
+  } else {
+    brks=nyr/10
+  }
   ANNpriors=bk_priors$ANN_priors
   temp_ANN=data.frame(yr=c(min(Cbj$yr),int_year_ANN,max(Cbj$yr)),ln=c(mean(bk_priors$ANN_priors$start[1:2]),
                                                                       mean(bk_priors$ANN_priors$int[1:2]),
                                                                       mean(bk_priors$ANN_priors$end[1:2])))
   p_1= ggplot2::ggplot(data=Cbj,ggplot2::aes(x=yr)) +
     ggplot2::theme_classic()+
-    ggplot2::scale_x_continuous(limits = c(min(Cbj$yr,na.rm=T)-1,max(Cbj$yr,na.rm=T)+1),breaks = breaks_pretty(n=nyr/5))+
+    ggplot2::scale_x_continuous(limits = c(min(Cbj$yr,na.rm=T)-1,max(Cbj$yr,na.rm=T)+1),breaks = breaks_pretty(n=brks))+
     ggplot2::geom_segment(ggplot2::aes(x=min(yr),y=as.numeric(ANNpriors[1,1]), xend=min(yr),yend=as.numeric(ANNpriors[2,1]),col="A"),size=1)+
     ggplot2::geom_segment(ggplot2::aes(x=max(yr),y=as.numeric(ANNpriors[1,3]), xend=max(yr),yend=as.numeric(ANNpriors[2,3]),col="A"),size=1)+
     ggplot2::geom_segment(ggplot2::aes(x=as.numeric(ANNpriors[3,2]),y=as.numeric(ANNpriors[1,2]), xend=as.numeric(ANNpriors[3,2]),yend=as.numeric(ANNpriors[2,2]),col="A"),size=1)+
@@ -1246,6 +1260,11 @@ ggcatch.plot= function(CLA.obj,METHOD,Management=F) {
   temp_data=as.data.frame(CLA.obj[["output"]][["output_timeseries"]])
   temp_data$yr=as.integer(row.names(temp_data))
   nyr=length(temp_data$yr)
+  if(nyr <41) {
+    brks=nyr/5
+  } else {
+    brks=nyr/10
+  }
   pic_catch=ggplot2::ggplot()+
     ggplot2::geom_segment(aes(y=CLA.obj[["output"]][["output_posteriors"]]$MSY_post[1],
                               yend=CLA.obj[["output"]][["output_posteriors"]]$MSY_post[1],
@@ -1263,7 +1282,7 @@ ggcatch.plot= function(CLA.obj,METHOD,Management=F) {
       legend.position = "bottom")+
     ggplot2::labs(x="Year",y="Catch",title=my_y_title,fill="",color="",linetype="")+
     ggplot2::scale_y_continuous(limits=c(0,NA),expand = c(0,0)) +
-    ggplot2::scale_x_continuous(expand = expansion(mult = c(0, 0.02)),breaks = breaks_pretty(n=nyr/5))# +
+    ggplot2::scale_x_continuous(expand = expansion(mult = c(0, 0.02)),breaks = breaks_pretty(n=brks))# +
   # theme(text = element_text(size = 10)) 
   
   if (Management==T) {
@@ -1286,7 +1305,7 @@ ggcatch.plot= function(CLA.obj,METHOD,Management=F) {
       # ggplot2::scale_fill_manual(labels=c("Catch"),values=c(clr))+
       ggplot2::labs(x="Year",y="Catch",title=my_y_title,fill="",color="",linetype="")+
       ggplot2::scale_y_continuous(limits=c(0,NA),expand = c(0,0)) +
-      ggplot2::scale_x_continuous(expand = expansion(mult = c(0, 0.02)),breaks = breaks_pretty(n=nyr/5))# +
+      ggplot2::scale_x_continuous(expand = expansion(mult = c(0, 0.02)),breaks = breaks_pretty(n=brks))# +
     # theme(text = element_text(size = 10)) 
     
   }
@@ -1312,7 +1331,11 @@ ggbk.plot= function(CLA.obj,METHOD,Management=F) {
   nyr=length(temp_data$yr)
   Bmsy= expression(B[MSY])
   Blim= expression(B[lim])
-  
+  if(nyr <41) {
+    brks=nyr/5
+  } else {
+    brks=nyr/10
+  }
   pic_bk=ggplot2::ggplot()+
     ggplot2::geom_line(data=temp_data,ggplot2::aes(x=yr,y=bk,color="blue"),size=0.7)+
     ggplot2::geom_ribbon(data=temp_data,ggplot2::aes(x=yr,ymin=bk_low, ymax=bk_high,fill="blue"),alpha=0.2)+
@@ -1332,7 +1355,7 @@ ggbk.plot= function(CLA.obj,METHOD,Management=F) {
     ggplot2::labs(y="Relative biomass B/k", x="Year",title=my_y_title,fill="",color="",shape="",linetype="")+ggplot2::theme(
       legend.position = "bottom")+
     ggplot2::scale_y_continuous(limits=c(0,NA),expand = c(0,0)) +
-    ggplot2::scale_x_continuous(expand = expansion(mult = c(0.02, 0.02)),breaks = breaks_pretty(n=nyr/5))
+    ggplot2::scale_x_continuous(expand = expansion(mult = c(0.02, 0.02)),breaks = breaks_pretty(n=brks))
   #  theme(text = element_text(size = 10)) 
   
   if (CLA.obj[["input"]][["Input_parameters"]][["nbk"]]==2) {
@@ -1368,7 +1391,7 @@ ggbk.plot= function(CLA.obj,METHOD,Management=F) {
                                      guide = guide_legend(override.aes = list(color = c("black", "blue"),size = c(0.7, 0.7))) )+
       ggplot2::labs(y="Relative biomass B/k", x="Year",title=my_y_title,fill="",color="",shape="",linetype="")+
       ggplot2::scale_y_continuous(limits=c(0,NA),expand = c(0,0)) +
-      ggplot2::scale_x_continuous(expand = expansion(mult = c(0, 0.02)),breaks = breaks_pretty(n=nyr/5))
+      ggplot2::scale_x_continuous(expand = expansion(mult = c(0, 0.02)),breaks = breaks_pretty(n=brks))
     #  theme(text = element_text(size = 10)) 
   }
   return(pic_bk)
@@ -1392,7 +1415,11 @@ ggFFmsy.plot= function(CLA.obj,METHOD,Management=F) {
   nyr=length(temp_data$yr)
   ly= expression(F/F[MSY])
   A_= expression('' ~ F/F[MSY] ~ "and"~"95%"~ "CI")
-  
+  if(nyr <41) {
+    brks=nyr/5
+  } else {
+    brks=nyr/10
+  }
   pic_FFmsy=ggplot2::ggplot()+
     ggplot2::geom_line(data=temp_data,ggplot2::aes(x=yr,y=FFmsy,color=clr),size=0.7)+
     ggplot2::geom_ribbon(data=temp_data,ggplot2::aes(x=yr,ymin=FFmsy_low, ymax=FFmsy_high,fill=clr),alpha=0.2)+
@@ -1403,7 +1430,7 @@ ggFFmsy.plot= function(CLA.obj,METHOD,Management=F) {
     ggplot2::labs(y=ly, x="Year",title=my_y_title,fill="",color="",shape="",linetype="")+
     ggplot2::theme(legend.position = "bottom")+
     ggplot2::scale_y_continuous(limits=c(0,NA),expand = c(0,0)) +
-    ggplot2::scale_x_continuous(expand = expansion(mult = c(0, 0.02)),breaks = breaks_pretty(n=nyr/5))
+    ggplot2::scale_x_continuous(expand = expansion(mult = c(0, 0.02)),breaks = breaks_pretty(n=brks))
   # theme(text = element_text(size = 10)) 
   
   if (Management==T) {
@@ -1418,7 +1445,7 @@ ggFFmsy.plot= function(CLA.obj,METHOD,Management=F) {
       ggplot2::scale_fill_manual(labels=c(A_),values=c(clr))+
       ggplot2::labs(y=ly, x="Year",title=my_y_title,fill="",color="",shape="",linetype="")+
       ggplot2::scale_y_continuous(limits=c(0,NA),expand = c(0,0)) +
-      ggplot2::scale_x_continuous(expand = expansion(mult = c(0, 0.02)),breaks = breaks_pretty(n=nyr/5))
+      ggplot2::scale_x_continuous(expand = expansion(mult = c(0, 0.02)),breaks = breaks_pretty(n=brks))
     # theme(text = element_text(size = 10)) 
   }
   return(pic_FFmsy)
@@ -1431,6 +1458,8 @@ ggparabola.plot= function(CLA.obj,METHOD) {
     clr="blue"} else if (METHOD=="BSM") {
       clr="red"
     }
+  
+  
   my_y_title <-bquote(atop(Equilibrium~curve~"for"~bold(.(CLA.obj[["input"]][["Stock_info"]]$Stock))))
   temp_data=as.data.frame(CLA.obj[["output"]][["output_timeseries"]])
   temp_data$yr=as.integer(row.names(temp_data))
@@ -2688,13 +2717,13 @@ ggrk_2.plot= function(ABC.obj,rk.obj,fit_obj,METHOD) {
 }
 
 gg_summary.plot= function(ABC.obj,fit_obj,METHOD) {
-  
+  ABC.obj[["input"]][["Stock_info"]][["Stock"]]
   rk.obj= ABC.obj[["rk_object"]]
   pic_1summary=ggcatch.plot(ABC.obj,METHOD,Management=F)+geom_point(data=ABC.obj[["input"]][["Input_data"]],
                                                                     ggplot2::aes(x=yr,y=ct),shape=21,fill="gray")+
     scale_y_continuous(limits = c(0,NA), expand = expansion(mult = c(0, 0.02)))+
-    theme(legend.position = "top")+ggtitle("Catch")
-  pic_2summary=ggrk.plot(ABC.obj,fit_obj,METHOD)+ggtitle("Finding viable r-k")
+    theme(legend.position = "top")+ggtitle(paste("Catch", ABC.obj[["input"]][["Stock_info"]][["Stock"]],"-"))
+  pic_2summary=ggrk.plot_summary(ABC.obj,fit_obj,METHOD)+ggtitle("Finding viable r-k")
   #pic_3summary=ggrk_2.plot(ABC.obj,rk.obj,fit_obj,METHOD)+ggtitle("Analysis of viable r-k")
   pic_3summary=  ggkiel.plot(ABC.obj,METHOD)+ggtitle("Biomass and Catch plot")+
     theme(legend.position = "bottom")
@@ -2894,7 +2923,11 @@ ggkiel.plot= function(CLA.obj,METHOD) {
   temp_data=as.data.frame(CLA.obj[["output"]][["output_timeseries"]])
   temp_data$yr=as.integer(row.names(temp_data))
   nyr=length(temp_data$yr)
-  
+  if(nyr <41) {
+    brks=nyr/5
+  } else {
+    brks=nyr/10
+  }
   
   temp_data$FMSY_Catch=temp_data$B*CLA.obj[["output"]][["output_posteriors"]][["Fmsy_post"]][1]
   temp_data$FMSY_Catch[temp_data$BBmsy<0.5]= temp_data$B[temp_data$BBmsy<0.5]*temp_data$BBmsy[temp_data$BBmsy<0.5]*2*CLA.obj[["output"]][["output_posteriors"]]$Fmsy_post[1]
@@ -2934,7 +2967,34 @@ ggkiel.plot= function(CLA.obj,METHOD) {
       legend.position = "bottom")+
     ggplot2::labs(x="Year",y="'Biomass & Catch",title=my_y_title,fill="",color="",linetype="")+
     ggplot2::scale_y_continuous(limits=c(0,1.05*max(temp_data$B)),expand = expansion(mult = c(0,0.0))) +
-    ggplot2::scale_x_continuous(expand = expansion(mult = c(0,0.03)),breaks = breaks_pretty(n=nyr/5))+
+    ggplot2::scale_x_continuous(expand = expansion(mult = c(0,0.03)),breaks = breaks_pretty(n=brks))+
     theme(text = element_text(size = 10)) 
   return(pic_biocatch)
+}
+
+ggrk.plot_summary= function(CLA.obj,fit.obj,METHOD) {
+  if (METHOD=="CMSY") {
+    clr="blue"} else if (METHOD=="BSM") {
+      clr="red"
+    }
+  my_y_title <-bquote(atop(Possible~"r-k"~pairs~"for"~bold(.(CLA.obj[["input"]][["Stock_info"]]$Stock))))
+  pick_rk<-ggplot2::ggplot() +
+    ggplot2::geom_point(data=CLA.obj$rk_object[["rkplots"]],ggplot2::aes(x=ri1,y=ki1),color="grey",size=0.7,alpha=0.4)+
+    ggplot2::scale_x_continuous(trans='log',limits=c(ifelse(0.95*quantile(CLA.obj$rk_object[["rkplots"]]$ri1,0.001)>
+                                                              CLA.obj[["output"]][["output_posteriors"]]$r_post[2],CLA.obj[["output"]][["output_posteriors"]]$r_post[2],
+                                                            0.95*quantile(CLA.obj$rk_object[["rkplots"]]$ri1,0.001)),1.2*quantile(CLA.obj$rk_object[["rkplots"]]$ri1,0.999)),labels = function(x) round(as.numeric(x),2)) +
+    ggplot2::scale_y_continuous(trans='log',limits=c(0.95*quantile(CLA.obj$rk_object[["rkplots"]]$ki1,0.001),1.2*quantile(CLA.obj$rk_object[["rkplots"]]$ki1,0.999)),labels = function(x) round(as.numeric(x))) +
+    ggplot2::theme_classic()+
+    ggplot2::labs(y="k (tonnes)", x="r (1/year)",title=my_y_title,col="")+
+    ggplot2::geom_rect(ggplot2::aes(xmin = as.numeric( CLA.obj[["input"]][["Input_parameters"]]$r.low),
+                                    xmax = as.numeric( CLA.obj[["input"]][["Input_parameters"]]$r.hi),
+                                    ymin =  as.numeric(CLA.obj$rk_object[["rkpriors"]]$prior.k.low),
+                                    ymax =  as.numeric(CLA.obj$rk_object[["rkpriors"]]$prior.k.hi)),linetype="dotted",fill=NA,colour = "black",size=1) +
+    ggplot2::geom_point(data=data.frame(rs=fit.obj[["r"]],ks=fit.obj[["k"]]),ggplot2::aes(x=rs,y=ks),color="gray18",size=0.7,alpha=0.2)+
+    ggplot2::geom_point(data= CLA.obj[["output"]][["output_posteriors"]],ggplot2::aes(x=r_post[1],y=k_post[1]),color=clr,size=1)+
+    ggplot2::geom_segment(data= CLA.obj[["output"]][["output_posteriors"]],ggplot2::aes(x=ifelse(r_post[2]>0,r_post[2],0.001),y=k_post[1],xend=r_post[3],yend=k_post[1],col=clr),size=0.8)+
+    ggplot2::geom_segment(data= CLA.obj[["output"]][["output_posteriors"]],ggplot2::aes(x=r_post[1],y=ifelse(k_post[2]>0,k_post[2],0.001),xend=r_post[1],yend=k_post[3],col=clr),size=0.8)+
+    scale_color_manual(label="r & K values with 95% CI",values=clr)+
+    theme(text = element_text(size = 10),legend.position = "top") 
+  return(pick_rk)
 }
