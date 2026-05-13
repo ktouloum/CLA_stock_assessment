@@ -920,7 +920,8 @@ shinyUI <- shinydashboard::dashboardPage(#skin = "purple",
                                                                                          style = "height: 100px; overflow-y: auto; padding-top: 5px;",
                                                                                          shiny::h4("The graph shows as light grey dots the explored log r-k space. Black dots are viable r-k pairs found to be compatible with catch and CPUE data and the priors, with the most probable r-k pair indicted by the red cross (with CI).  The dotted rectangle indicates the prior r-k range."
                                                                                          ))),
-                                                                                     width = 8,height = 620)))),
+                                                                                     width = 8,height = 620)
+                                                                 ))),
                                        shiny::fluidRow(
                                          conditionalPanel(condition = "input.Start_run",
                                                           shinydashboard::box(collapsible = F,
@@ -948,7 +949,8 @@ shinyUI <- shinydashboard::dashboardPage(#skin = "purple",
                                                                                   style = "height: 100px; overflow-y: auto; padding-top: 5px;",
                                                                                   shiny::h4("Plot of estimated biomass (blue), with dotted lines indicating the 2.5th and 97.5th percentiles. Vertical purple lines indicate the prior biomass ranges and the grey dots indicate the scaled CPUE. The dashed horizontal line indicates Bmsy and the dotted line indicates Blim."
                                                                                   ))),
-                                                                              width = 12,height = 620))),
+                                                                              width = 12,height = 620)
+                                                          )),
                                        shiny::fluidRow(
                                          conditionalPanel(condition = "input.Start_run",
                                                           shinydashboard::box(collapsible = F,
@@ -962,7 +964,8 @@ shinyUI <- shinydashboard::dashboardPage(#skin = "purple",
                                                                                   style = "height: 100px; overflow-y: auto; padding-top: 5px;",
                                                                                   shiny::h4("Exploitation (F/Fmsy) as estimated (red), where the dashed horizontal line indicates Fmsy. The grey dots are the observed harvest rate scaled to results."
                                                                                   ))),
-                                                                              width = 12,height = 620))),
+                                                                              width = 12,height = 620)
+                                                          )),
                                        # column(width = 12,align="center",#,offset=1
                                        shiny::fluidRow(
                                          conditionalPanel(condition = "input.Start_run",
@@ -977,7 +980,8 @@ shinyUI <- shinydashboard::dashboardPage(#skin = "purple",
                                                                                   style = "height: 100px; overflow-y: auto; padding-top: 5px;",
                                                                                   shiny::h4("Surplus production equilibrium parabola, with reduced productivity at small stock sizes. Overlaid are the corresponding modeled results for relative catch and stock size (red).", actionLink(inputId = "open_helpTablerk", label = "(More Guidance)")))
                                                                               ),
-                                                                              width = 12,height = 620))),
+                                                                              width = 12,height = 620)
+                                                          )),
                                         shiny::fluidRow(
                                           conditionalPanel(condition = "input.Start_run",
                                                            shinydashboard::box(collapsible = F,
@@ -991,7 +995,8 @@ shinyUI <- shinydashboard::dashboardPage(#skin = "purple",
                                                                                    style = "height: 100px; overflow-y: auto; padding-top: 5px;",
                                                                                    shiny::h4("Kiel-plot of biomass (blue), catch (black) and maximum sustainable Fmsy-catch given the biomass (green), for easy comparison. The dotted line indicates the absolute maximum sustainable catch (MSY) and the dashed line indicates the minimum biomass that can produce MSY. Note that Fmsy is reduced linearly if biomass falls below Bmsy and becomes zero below half of Bmsy."
                                                                                    ))),
-                                                                               width = 12,height = 620))),
+                                                                               width = 12,height = 620)
+                                                           )),
                                        shiny::fluidRow(
                                          column(width = 12,align="center",offset=1,
                                                 conditionalPanel(condition = "input.Start_run",
@@ -1006,7 +1011,8 @@ shinyUI <- shinydashboard::dashboardPage(#skin = "purple",
                                                                                          style = "height: 80px; overflow-y: auto; padding-top: 5px;",
                                                                                          shiny::h4("The Kobe plot combines the time series of stock size (B/Bmsy on the X-axis) and exploitation (F/Fmsy on the Y-axis). The colors identify combinations of stock size and exploitation as: Green = sustainable; Yellow = overfished; Orange = subject to overfishing; Red = overfished and subject to overfishing. The black line shows the time series of stock status and exploitation, and the shaded areas give the plausible confidence intervals for the last year as detailed in the legend."
                                                                                          ))),
-                                                                                     width = 10,height = 620)))
+                                                                                     width = 10,height = 620)
+                                                                 ))
                                 )
                                 
                                 )
@@ -1409,7 +1415,6 @@ shinyServer=function(input, output, session){
       ggplot2::theme_classic(base_size = fs)+
       ggplot2::scale_y_continuous(limits=c(0,NA))+
       ggplot2::scale_x_continuous(breaks = breaks_pretty(n=length(dt$yr)/5))
-    
   }, height = 200)
   
   output$Biomass_plot= shiny::renderPlot({
@@ -1490,7 +1495,6 @@ shinyServer=function(input, output, session){
     req(loaded_stock_object())
     ggplot2::theme_classic(base_size = fs)+
       fs <- responsive_font("loaded_catch_plot", session)
-    
     xx=loaded_stock_object()$input$Input_data
     ggplot()+geom_line(data = xx,aes(x=yr,y=ct),col="blue")+
       geom_point(data = xx,aes(x=yr,y=ct))+
@@ -1794,9 +1798,7 @@ shinyServer=function(input, output, session){
     output$RK_priors_pic= shiny::renderPlot({
       req(rk_obj())
       fs <- responsive_font("RK_priors_pic", session)
-      
       xxx=rk_obj()$pic+ggplot2::theme_classic(base_size = fs)
-
       print(xxx)
     })#, height = 340
     
@@ -1888,11 +1890,6 @@ shinyServer=function(input, output, session){
       
       expert_bk_ind_year_priors=c(ebk_stat_year)
     })
-    
-    
-    
-    
-    
     
     temp_expert_bk_end=reactive({
       expert_bk_end_=input$expert_bk_end
@@ -2268,7 +2265,6 @@ shinyServer=function(input, output, session){
       fs <- responsive_font("rk_space", session)
      xxxx=run_pictures$pic_A+
         ggplot2::theme_classic(base_size = fs)
-        
      xxxx})
     
     ####################### Stock info
